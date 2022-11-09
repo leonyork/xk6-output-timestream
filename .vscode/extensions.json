@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "golang.go",
+    "esbenp.prettier-vscode",
+    "foxundermoon.shell-format",
+    "exiasr.hadolint",
+    "ms-azuretools.vscode-docker"
+  ]
+}

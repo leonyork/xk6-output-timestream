@@ -1,0 +1,73 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.224.2/containers/docker-existing-dockerfile
+{
+  "name": "dev",
+
+  "build": {
+    "context": "..",
+    "dockerfile": "../Dockerfile",
+    "target": "dev"
+  },
+
+  "containerEnv": {
+    // Means that default region is loaded from the ~/.aws/config file.
+    // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-region.html
+    "AWS_SDK_LOAD_CONFIG": "true"
+  },
+
+  // Set *default* container specific settings.json values on container create.
+  "settings": {
+    "go.testOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": true,
+      "source.organizeImports": true
+    },
+    "[go]": {
+      "editor.defaultFormatter": "golang.go"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[shellscript]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[dockerfile]": {
+      "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
+    "[ignore]": {
+      "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "shellformat.path": "/go/bin/shfmt",
+    "editor.formatOnSave": true,
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.profiles.linux": {
+      "zsh": {
+        "path": "/bin/zsh"
+      }
+    }
+  },
+
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "golang.go",
+    "esbenp.prettier-vscode",
+    "foxundermoon.shell-format",
+    "exiasr.hadolint",
+    "ms-azuretools.vscode-docker",
+    "DavidAnson.vscode-markdownlint"
+  ],
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [],
+
+  "onCreateCommand": "sh ./.devcontainer/tools.sh",
+  //"postCreateCommand": "yarn install",
+
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/root/.aws,type=bind,consistency=cached"
+  ]
+}
