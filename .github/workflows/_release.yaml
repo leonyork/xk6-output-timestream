@@ -1,0 +1,31 @@
+name: Release
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        type: string
+        required: false
+      builder_image:
+        type: string
+        required: true
+    secrets:
+      SSH_KEY_GITHUB:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    container:
+      image: ${{ inputs.builder_image }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Needed so that we trigger the version tag action - see
+          # https://github.com/orgs/community/discussions/27028#discussioncomment-3254367
+          ssh-key: "${{ secrets.SSH_KEY_GITHUB }}"
+          ref: ${{ inputs.git_ref }}
+          fetch-depth: 0
+      - run: make release-tag

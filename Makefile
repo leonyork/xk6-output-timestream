@@ -84,18 +84,29 @@ check-all:
 # Targets that are mainly run from CI
 #################################################
 
+.PHONY: pull-builder
 pull-builder:
 	-docker pull $(BUILDER_NAME)
-.PHONY: pull-builder
 
 CACHE_CMD=
 ifneq ($(CACHE_NAME),)
 	CACHE_CMD=--cache-from $(CACHE_NAME)
 endif
+.PHONY: build-builder
 build-builder: 
 	docker build -t $(BUILDER_NAME) $(CACHE_CMD) .
-.PHONY: build-builder
 
+.PHONY: push-builder
 push-builder:
 	docker push $(BUILDER_NAME)
-.PHONY: push-builder
+
+# Tags the repo
+# See https://upliftci.dev/
+.PHONY: release-tag
+release-tag:
+	uplift release --skip-changelog
+
+VERSION=$(shell git tag -l --contains HEAD | grep '^v')
+.PHONY: release-go
+release-go:
+	GOPROXY=proxy.golang.org go list -m github.com/leonyork/xk6-output-timestream@$(VERSION)

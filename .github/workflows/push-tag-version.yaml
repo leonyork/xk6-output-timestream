@@ -1,0 +1,15 @@
+# Note that get this to run you need to follow the instructions
+# in https://github.com/orgs/community/discussions/27028#discussioncomment-3254367
+name: Build on Push (version tag)
+on:
+  push:
+    tags:
+      - "v*.*.*"
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: golang:1.19.3-buster
+    steps:
+      - uses: actions/checkout@v3
+      - run: make VERSION=${{ github.ref_name }} release-go

@@ -74,6 +74,7 @@ plugins=(
   docker-compose
   git
   golang
+  uplift
   vscode
   zsh-autosuggestions
   zsh-syntax-highlighting

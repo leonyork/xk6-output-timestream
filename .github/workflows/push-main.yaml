@@ -21,3 +21,14 @@ jobs:
       builder_image: ${{ needs.prepare.outputs.builder_image }}
     needs:
       - prepare
+
+  release:
+    uses: ./.github/workflows/_release.yaml
+    with:
+      builder_image: ${{ needs.prepare.outputs.builder_image }}
+    secrets:
+      SSH_KEY_GITHUB: ${{ secrets.SSH_KEY_GITHUB }}
+    needs:
+      - prepare
+      - build
+      - validate
