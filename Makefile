@@ -1,11 +1,28 @@
 .PHONY: build
 export K6_VERSION=v0.40.0
 build:
-	xk6 build --with xk6-output-timestream=$(CURDIR) --output /go/bin/k6
+	xk6 build --with xk6-output-timestream=$(CURDIR) --output $$GOPATH/bin/k6
 
-.PHONY: test
-test:
+.PHONY: test-unit
+test-unit:
 	go test
+
+
+K6_TIMESTREAM_DATABASE_NAME=test
+K6_TIMESTREAM_TABLE_NAME=test
+K6_USER_COUNT=2
+K6_ITERATIONS=4
+
+K6_TEST_CMD=K6_TIMESTREAM_DATABASE_NAME=$(K6_TIMESTREAM_DATABASE_NAME) \
+	K6_TIMESTREAM_TABLE_NAME=$(K6_TIMESTREAM_TABLE_NAME) \
+	k6 run test/test.js \
+	-u $(K6_USER_COUNT) \
+	-i $(K6_ITERATIONS) \
+	-o timestream \
+	--verbose
+.PHONY: test-integration
+test-integration: build
+	$(K6_TEST_CMD)
 
 #################################################
 # Dev tooling (including code formatting 
