@@ -1,4 +1,4 @@
-module xk6-output-timestream
+module github.com/leonyork/xk6-output-timestream
 
 go 1.19
 
