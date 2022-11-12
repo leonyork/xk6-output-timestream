@@ -32,7 +32,8 @@ RUN curl -fsSL \
   -o /usr/local/bin/hadolint \
   && chmod +x /usr/local/bin/hadolint
 
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.5.1
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.5.1 \
+  && go install github.com/segmentio/golines@v0.9.0
 
 # Node for prettier
 # hadolint ignore=DL3009,DL4006

@@ -1,6 +1,14 @@
+.PHONY: build
+export K6_VERSION=v0.40.0
+build:
+	xk6 build --with xk6-output-timestream=$(CURDIR) --output /go/bin/k6
+
+.PHONY: test
+test:
+	go test
 
 #################################################
-# Dev tooling (include code formatting 
+# Dev tooling (including code formatting 
 # + checking)
 #################################################
 
@@ -23,7 +31,7 @@ check: prettier-check hadolint-check shfmt-check
 # Formatting with go fmt (golang)
 .PHONY: fmt
 fmt:
-	go fmt ./...
+	golines -w .
 
 # Formatting with prettier (json)
 .PHONY: prettier
