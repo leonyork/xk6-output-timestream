@@ -23,3 +23,20 @@ The dimensions (see [timestream concepts](https://docs.aws.amazon.com/timestream
 If you do not have any tags setup you will see the error `At least one dimension is required for a record.` logged from timestream. More information can be found in [the K6 documentation](https://k6.io/docs/using-k6/tags-and-groups/) or an example of setting up tags can be found in the [integration test script](test/test.js).
 
 ## Development
+
+I use [VSCode](https://code.visualstudio.com/) for development so this will be the best supported editor. However, you should be able to use other IDEs. If you are using another IDE:
+
+1. The [Dockerfile](Dockerfile) `dev` target shows all the tools you need for a dev environment (e.g. For linting).
+2. There are [suggested tools](.devcontainer/tools.default.sh) you can also use.
+
+### VSCode
+
+The preferred way to develop using VSCode is to use the [dev container feature](https://code.visualstudio.com/learn/develop-cloud/containers). This will mean you have all the tools required and suggested for development.
+
+If you do want to use different tools (e.g. you don't like the shell setup), create `.devcontainer/tools.override.sh` and base it off [.devcontainer/tools.default.sh](.devcontainer/tools.default.sh).
+
+If you don't want to use dev containers, you'll need to make sure you install the tools from the [Dockerfile](Dockerfile) and the packages in [suggested tools](.devcontainer/tools.default.sh) that are needed for the VSCode extensions.
+
+### Where to start for development
+
+[output.go](output.go) contains the logic for converting from K6 metric samples to AWS Timestream records and then saving those records.
