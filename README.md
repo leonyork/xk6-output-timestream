@@ -16,6 +16,21 @@ For more information see [the alternatives](docs/Alternatives.md)
 
 This output is written as an extension to K6 using [xk6 extensions](https://github.com/grafana/xk6) - this is **experimental**. You'll need to build this into K6 - see [the custom build instructions](https://github.com/grafana/xk6#custom-builds).
 
+### Configuration
+
+For all configuration specific to this extension see the `Config struct` in [config.go](config.go).
+
+The key bits of config you'll need to setup are the following environment variables
+
+```sh
+K6_TIMESTREAM_DATABASE_NAME
+K6_TIMESTREAM_TABLE_NAME
+```
+
+There is a sample command in the `test-integration` target in [the Makefile](Makefile).
+
+You'll also need to setup your AWS credentials - see [the guide on how to do this](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials).
+
 ### Tags
 
 The dimensions (see [timestream concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)) are taken from any K6 tags that have non-empty values.
