@@ -1,0 +1,43 @@
+name: Validate
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        type: string
+        required: false
+      builder_image:
+        type: string
+        required: true
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    container:
+      image: ${{ inputs.builder_image }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.git_ref }}
+      - run: make check
+      - run: make format && git diff --exit-code
+    permissions:
+      contents: "read"
+      packages: "read"
+
+  test:
+    runs-on: ubuntu-22.04
+    container:
+      image: ${{ inputs.builder_image }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.git_ref }}
+      - run: make test-unit
+    permissions:
+      contents: "read"
+      packages: "read"

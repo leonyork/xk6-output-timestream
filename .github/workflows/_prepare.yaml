@@ -1,0 +1,32 @@
+name: Prepare
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        type: string
+        required: false
+    outputs:
+      builder_image:
+        description: The builder image to be used when building the project
+        value: ${{ jobs.builder.outputs.builder_image }}
+jobs:
+  builder:
+    runs-on: ubuntu-22.04
+    outputs:
+      builder_image: ${{ steps.builder.outputs.image }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.git_ref }}
+      - uses: ./.github/actions/build-builder
+        id: builder
+        with:
+          image-name: ${{ github.repository }}-builder
+          pull-command: make pull-builder
+          build-and-push-command: make build-builder push-builder
+          image-name-env-variable-name: BUILDER_NAME
+          cache-name-env-variable-name: CACHE_NAME
+          cache-key: ${{ hashFiles('Dockerfile') }}
+    permissions:
+      contents: "read"
+      packages: "write"

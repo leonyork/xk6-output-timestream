@@ -79,3 +79,23 @@ shfmt-check:
 .PHONY: check-all
 check-all:
 	pre-commit run --all-files
+
+#################################################
+# Targets that are mainly run from CI
+#################################################
+
+pull-builder:
+	-docker pull $(BUILDER_NAME)
+.PHONY: pull-builder
+
+CACHE_CMD=
+ifneq ($(CACHE_NAME),)
+	CACHE_CMD=--cache-from $(CACHE_NAME)
+endif
+build-builder: 
+	docker build -t $(BUILDER_NAME) $(CACHE_CMD) .
+.PHONY: build-builder
+
+push-builder:
+	docker push $(BUILDER_NAME)
+.PHONY: push-builder

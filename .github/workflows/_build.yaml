@@ -1,0 +1,31 @@
+name: Build
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        type: string
+        required: false
+      builder_image:
+        type: string
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    container:
+      image: ${{ inputs.builder_image }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ github.token }}
+    permissions:
+      contents: "read"
+      packages: "read"
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.git_ref }}
+      - run: make build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: k6
+          path: /go/bin/k6

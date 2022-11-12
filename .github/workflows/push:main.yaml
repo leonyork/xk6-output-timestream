@@ -1,0 +1,23 @@
+name: Build on Push (main)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  prepare:
+    uses: ./.github/workflows/_prepare.yaml
+
+  validate:
+    uses: ./.github/workflows/_validate.yaml
+    with:
+      builder_image: ${{ needs.prepare.outputs.builder_image }}
+    needs:
+      - prepare
+
+  build:
+    uses: ./.github/workflows/_build.yaml
+    with:
+      builder_image: ${{ needs.prepare.outputs.builder_image }}
+    needs:
+      - prepare
