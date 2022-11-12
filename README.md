@@ -55,3 +55,5 @@ If you don't want to use dev containers, you'll need to make sure you install th
 ### Where to start for development
 
 [output.go](output.go) contains the logic for converting from K6 metric samples to AWS Timestream records and then saving those records.
+
+There are targets for different development tasks in [the Makefile](Makefile).
