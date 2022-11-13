@@ -1,7 +1,8 @@
 .PHONY: build
 export K6_VERSION=v0.40.0
+export K6_LOCATION=$(GOPATH)/bin/k6
 build:
-	xk6 build --with xk6-output-timestream=$(CURDIR) --output $$GOPATH/bin/k6
+	xk6 build --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
 
 .PHONY: test-unit
 test-unit:
@@ -110,3 +111,13 @@ VERSION=$(shell git tag -l --contains HEAD | grep '^v')
 .PHONY: release-go
 release-go:
 	GOPROXY=proxy.golang.org go list -m github.com/leonyork/xk6-output-timestream@$(VERSION)
+
+.PHONY: changelog
+changelog:
+	uplift changelog --no-stage --no-push
+
+.PHONY: release-github
+release-github:
+	gh release create $(VERSION) \
+    '$(K6_LOCATION)#K6 x86_64 executable with timestream' \
+    -F CHANGELOG.md
