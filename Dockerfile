@@ -47,8 +47,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x \
   --no-install-recommends \
   && apt-get clean
 
+# Prettier for formatting
 RUN npm install --global prettier@2.7.1
 
+# uplift for creating versions from conventional commits
 RUN curl -fsSL https://raw.githubusercontent.com/gembaadvantage/uplift/main/scripts/install \
   | bash -s -- -v v2.18.1 --no-sudo
-
