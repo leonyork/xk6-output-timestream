@@ -5,11 +5,52 @@ on:
   push:
     tags:
       - "v*.*.*"
+
+permissions:
+  contents: write
+
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  release-go-package:
+    runs-on: ubuntu-22.04
     container:
       image: golang:1.19.3-buster
     steps:
       - uses: actions/checkout@v3
       - run: make VERSION=${{ github.ref_name }} release-go
+  create-changelog:
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}-builder:${{ github.sha }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - run: make changelog
+      - uses: actions/upload-artifact@v3
+        with:
+          name: CHANGELOG.md
+          path: CHANGELOG.md
+  release-github:
+    runs-on: ubuntu-22.04
+    needs:
+      - create-changelog
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: CHANGELOG.md
+          path: ./
+      - uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: push-main.yaml
+          workflow_conclusion: success
+          commit: ${{github.sha}}
+          name: k6
+      - run: |
+          gh release create ${{ github.ref_name }} \
+            './k6#x86_64 K6 executable including timestream' \
+            -F CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
