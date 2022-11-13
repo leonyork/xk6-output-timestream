@@ -110,3 +110,7 @@ VERSION=$(shell git tag -l --contains HEAD | grep '^v')
 .PHONY: release-go
 release-go:
 	GOPROXY=proxy.golang.org go list -m github.com/leonyork/xk6-output-timestream@$(VERSION)
+
+.PHONY: changelog
+changelog:
+	uplift changelog --no-stage --no-push
