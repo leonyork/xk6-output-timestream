@@ -12,20 +12,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    container:
-      image: ${{ inputs.builder_image }}
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ github.token }}
     permissions:
       contents: "read"
-      packages: "read"
+      packages: "write"
     steps:
       - uses: actions/checkout@v3
         with:
           ref: ${{ inputs.git_ref }}
-      - run: make build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login ghcr.io
+        shell: bash
+        run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+      - name: Pull builder
+        shell: bash
+        run: docker pull ${{ inputs.builder_image }}
+      - run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            VERSION=v${{ inputs.git_ref || github.sha }} \
+            CACHE_NAME=${{ inputs.builder_image }} \
+            build-image \
+            push-image \
+            copy-k6-from-image
+        env:
+          K6_LOCATION: "./k6"
       - uses: actions/upload-artifact@v3
         with:
           name: k6
-          path: /go/bin/k6
+          path: ./k6
