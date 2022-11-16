@@ -20,7 +20,7 @@ jobs:
   create-changelog:
     runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/${{ github.repository }}-builder:${{ github.sha }}
+      image: ghcr.io/${{ github.repository }}-ci-builder:${{ github.sha }}
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
@@ -49,6 +49,21 @@ jobs:
           workflow_conclusion: success
           commit: ${{github.sha}}
           name: k6
+      - name: Login ghcr.io
+        shell: bash
+        run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+      - run: docker pull ghcr.io/${{ github.repository_owner }}/k6:v${{ github.sha }}
+      - run: docker pull ghcr.io/${{ github.repository_owner }}/k6:v${{ github.sha }}
+      - run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            CACHE_NAME="ghcr.io/${{ github.repository_owner }}/k6:v${{ github.sha }} --cache-from ghcr.io/${{ github.repository }}-ci-builder:${{ github.sha }} \
+            build-image \
+            push-image
+      - run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            update-changelog
       - run: make VERSION=${{ github.ref_name }} release-github
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,30 +1,9 @@
 export K6_VERSION=v0.40.0
-# In Dockerhub the versions are without the leading 'v'
-K6_VERSION_NO_V=$(subst v,,$(K6_VERSION))
 export K6_LOCATION?=$(GOPATH)/bin/k6
 
 .PHONY: build
 build:
-	xk6 build --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
-
-IMAGE_NAME=leonyork/k6
-
-FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)
-VERSION=$(shell git tag -l --contains HEAD | grep '^v')
-VERSION_NO_V=$(subst v,,$(VERSION))
-ifneq ($(VERSION_NO_V),)
-	FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)-timestream$(VERSION_NO_V)
-endif
-
-CACHE_CMD=
-ifneq ($(CACHE_NAME),)
-	CACHE_CMD=--cache-from $(CACHE_NAME)
-endif
-
-.PHONY: build-image
-build-image: 
-	@echo $(FULL_IMAGE_NAME)
-	docker build --build-arg K6_VERSION=$(K6_VERSION_NO_V) --build-arg VERSION=$(VERSION) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
+	xk6 build $(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
 
 .PHONY: test-unit
 test-unit:
@@ -114,13 +93,45 @@ CACHE_CMD=
 ifneq ($(CACHE_NAME),)
 	CACHE_CMD=--cache-from $(CACHE_NAME)
 endif
+BUILDER_TARGET=ci
 .PHONY: build-builder
 build-builder: 
-	docker build --target ci -t $(BUILDER_NAME) $(CACHE_CMD) .
+	docker build --target $(BUILDER_TARGET) -t $(BUILDER_NAME) $(CACHE_CMD) .
 
 .PHONY: push-builder
 push-builder:
 	docker push $(BUILDER_NAME)
+
+IMAGE_NAME=k6
+# In Dockerhub the versions are without the leading 'v'
+K6_VERSION_NO_V=$(subst v,,$(K6_VERSION))
+FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)
+
+VERSION=$(shell git tag -l --contains HEAD | grep '^v')
+VERSION_NO_V=$(subst v,,$(VERSION))
+ifneq ($(VERSION_NO_V),)
+	FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)-timestream$(VERSION_NO_V)
+endif
+.PHONY: build-image
+build-image: 
+	docker build --target k6 --build-arg K6_VERSION=$(K6_VERSION_NO_V) --build-arg VERSION=$(VERSION) $(CACHE_CMD) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
+
+.PHONY: push-image
+push-image:
+	docker push $(FULL_IMAGE_NAME)
+
+.PHONY: image-name
+image-name:
+	@echo $(FULL_IMAGE_NAME)
+
+.PHONY: update-changelog
+update-changelog:
+	echo '\n**Docker image**: $(shell make image-name)' >> CHANGELOG.md
+
+.PHONY: copy-k6-from-image
+copy-k6-from-image:
+	docker cp $$(docker create --name tc $(FULL_IMAGE_NAME)):/usr/bin/k6 $(K6_LOCATION)
+	docker rm tc
 
 # Tags the repo
 # See https://upliftci.dev/
