@@ -9,11 +9,15 @@ on:
       builder_image:
         description: The builder image to be used when building the project
         value: ${{ jobs.builder.outputs.builder_image }}
+      ci_builder_image:
+        description: The CI builder image (includes linting + testing tools) to be used when building the project
+        value: ${{ jobs.builder.outputs.ci_builder_image }}
 jobs:
   builder:
     runs-on: ubuntu-22.04
     outputs:
       builder_image: ${{ steps.builder.outputs.image }}
+      ci_builder_image: ${{ steps.ci_builder.outputs.image }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,7 +27,16 @@ jobs:
         with:
           image-name: ${{ github.repository }}-builder
           pull-command: make pull-builder
-          build-and-push-command: make build-builder push-builder
+          build-and-push-command: make BUILDER_TARGET=builder build-builder push-builder
+          image-name-env-variable-name: BUILDER_NAME
+          cache-name-env-variable-name: CACHE_NAME
+          cache-key: ${{ hashFiles('Dockerfile') }}
+      - uses: ./.github/actions/build-builder
+        id: ci_builder
+        with:
+          image-name: ${{ github.repository }}-ci-builder
+          pull-command: make pull-builder
+          build-and-push-command: make BUILDER_TARGET=ci build-builder push-builder
           image-name-env-variable-name: BUILDER_NAME
           cache-name-env-variable-name: CACHE_NAME
           cache-key: ${{ hashFiles('Dockerfile') }}
