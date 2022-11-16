@@ -41,7 +41,7 @@ If you do not have any tags setup you will see the error `At least one dimension
 
 I use [VSCode](https://code.visualstudio.com/) for development so this will be the best supported editor. However, you should be able to use other IDEs. If you are using another IDE:
 
-1. The [Dockerfile](Dockerfile) `dev` target shows all the tools you need for a dev environment (e.g. For linting).
+1. The [Dockerfile](Dockerfile) `ci` target shows all the tools you need for a dev environment (e.g. For linting).
 2. There are [suggested tools](.devcontainer/tools.default.sh) you can also use.
 
 ### VSCode

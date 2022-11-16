@@ -1,13 +1,34 @@
-.PHONY: build
 export K6_VERSION=v0.40.0
+# In Dockerhub the versions are without the leading 'v'
+K6_VERSION_NO_V=$(subst v,,$(K6_VERSION))
 export K6_LOCATION?=$(GOPATH)/bin/k6
+
+.PHONY: build
 build:
 	xk6 build --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
+
+IMAGE_NAME=leonyork/k6
+
+FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)
+VERSION=$(shell git tag -l --contains HEAD | grep '^v')
+VERSION_NO_V=$(subst v,,$(VERSION))
+ifneq ($(VERSION_NO_V),)
+	FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)-timestream$(VERSION_NO_V)
+endif
+
+CACHE_CMD=
+ifneq ($(CACHE_NAME),)
+	CACHE_CMD=--cache-from $(CACHE_NAME)
+endif
+
+.PHONY: build-image
+build-image: 
+	@echo $(FULL_IMAGE_NAME)
+	docker build --build-arg K6_VERSION=$(K6_VERSION_NO_V) --build-arg VERSION=$(VERSION) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
 
 .PHONY: test-unit
 test-unit:
 	go test
-
 
 K6_TIMESTREAM_DATABASE_NAME=test
 K6_TIMESTREAM_TABLE_NAME=test
@@ -95,7 +116,7 @@ ifneq ($(CACHE_NAME),)
 endif
 .PHONY: build-builder
 build-builder: 
-	docker build -t $(BUILDER_NAME) $(CACHE_CMD) .
+	docker build --target ci -t $(BUILDER_NAME) $(CACHE_CMD) .
 
 .PHONY: push-builder
 push-builder:
@@ -107,7 +128,6 @@ push-builder:
 release-tag:
 	uplift release --skip-changelog
 
-VERSION=$(shell git tag -l --contains HEAD | grep '^v')
 .PHONY: release-go
 release-go:
 	GOPROXY=proxy.golang.org go list -m github.com/leonyork/xk6-output-timestream@$(VERSION)

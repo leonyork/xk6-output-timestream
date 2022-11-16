@@ -6,7 +6,7 @@
   "build": {
     "context": "..",
     "dockerfile": "../Dockerfile",
-    "target": "dev"
+    "target": "ci"
   },
 
   "containerEnv": {
