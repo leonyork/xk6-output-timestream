@@ -34,16 +34,19 @@ runs:
       shell: bash
       run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
     - name: Pull cached image
+      if: inputs.pull-command != ''
+      id: cache-image
       shell: bash
       run: |
         export ${{ inputs.image-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.cache-key }}
         ${{ inputs.pull-command }}
+        echo "image=$(echo ghcr.io/${{ inputs.image-name }}:${{ inputs.cache-key }})" >> $GITHUB_OUTPUT
     - name: Build and push image
       id: build-builder
       shell: bash
       run: |
         export ${{ inputs.image-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.git_ref || github.sha }}
-        export ${{ inputs.cache-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.cache-key }}
+        export ${{ inputs.cache-name-env-variable-name }}=${{ steps.cache-image.outputs.image }}
         ${{ inputs.build-and-push-command }}
         echo "image=$(echo $${{ inputs.image-name-env-variable-name }})" >> $GITHUB_OUTPUT
     - name: Cache image

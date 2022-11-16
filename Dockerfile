@@ -5,7 +5,7 @@ ARG K6_VERSION=0.40.0
 #################################################
 FROM golang:1.19.3-buster AS builder
 
-RUN go install go.k6.io/xk6/cmd/xk6@v0.7.0
+RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
 
 
 #################################################
@@ -25,7 +25,7 @@ RUN apt-get update \
   && curl -fsSL \
   "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip" \
   -o "awscli.zip" \
-  && unzip awscli.zip \
+  && unzip -q awscli.zip \
   && ./aws/install \
   && rm -f awscli.zip \
   && rm -rf ./aws
@@ -77,7 +77,7 @@ RUN make K6_VERSION=v$K6_VERSION build
 # "Update" the k6 official image
 #################################################
 
-FROM loadimpact/k6:$K6_VERSION
+FROM loadimpact/k6:$K6_VERSION AS k6
 ARG K6_VERSION=$K6_VERSION
 ARG VERSION=$VERSION
 

@@ -11,21 +11,23 @@ jobs:
   validate:
     uses: ./.github/workflows/_validate.yaml
     with:
-      builder_image: ${{ needs.prepare.outputs.builder_image }}
+      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
     needs:
       - prepare
 
   build:
     uses: ./.github/workflows/_build.yaml
     with:
-      builder_image: ${{ needs.prepare.outputs.builder_image }}
+      # Seems to need the CI container on Github Actions rather
+      # than just the builder image :(
+      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
     needs:
       - prepare
 
   release:
     uses: ./.github/workflows/_release.yaml
     with:
-      builder_image: ${{ needs.prepare.outputs.builder_image }}
+      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
     secrets:
       SSH_KEY_GITHUB: ${{ secrets.SSH_KEY_GITHUB }}
     needs:
