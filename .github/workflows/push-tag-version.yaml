@@ -8,19 +8,13 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
-  release-go-package:
-    runs-on: ubuntu-22.04
-    container:
-      image: golang:1.19.3-buster
-    steps:
-      - uses: actions/checkout@v3
-      - run: make VERSION=${{ github.ref_name }} release-go
   create-changelog:
     runs-on: ubuntu-22.04
     container:
-      image: ghcr.io/${{ github.repository }}-builder:${{ github.sha }}
+      image: ghcr.io/${{ github.repository }}-ci-builder:${{ github.sha }}
       credentials:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
@@ -33,23 +27,57 @@ jobs:
         with:
           name: CHANGELOG.md
           path: CHANGELOG.md
-  release-github:
+
+  release:
     runs-on: ubuntu-22.04
     needs:
       - create-changelog
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - name: Download CHANGELOG
+        uses: actions/download-artifact@v3
         with:
           name: CHANGELOG.md
           path: ./
-      - uses: dawidd6/action-download-artifact@v2
+      - name: Download k6 executable (x86_64)
+        uses: dawidd6/action-download-artifact@v2
         with:
           workflow: push-main.yaml
           workflow_conclusion: success
           commit: ${{github.sha}}
           name: k6
+      - name: Login ghcr.io
+        run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+      - name: Pull built CI image to cache
+        run: docker pull ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+      - name: Tag cached image
+        run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            VERSION=${{ github.ref_name }} \
+            CACHE_NAME=ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
+            tag-cached-image \
+            push-image
+      - name: Update changelog with tagged image
+        run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            VERSION=${{ github.ref_name }} \
+            update-changelog
       - run: make VERSION=${{ github.ref_name }} release-github
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           K6_LOCATION: "./k6"
+
+  release-go-package:
+    needs:
+      - release
+    runs-on: ubuntu-22.04
+    container:
+      image: ghcr.io/${{ github.repository }}-ci-builder:${{ github.sha }}
+      credentials:
+        username: ${{ github.repository_owner }}
+        password: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v3
+      - run: make VERSION=${{ github.ref_name }} release-go
