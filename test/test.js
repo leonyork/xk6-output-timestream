@@ -10,6 +10,6 @@ export const options = {
 };
 
 export default function () {
-  http.get("https://test.k6.io");
+  http.get(__ENV.TARGET_URL || "https://test.k6.io");
   sleep(0.5);
 }

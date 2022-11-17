@@ -1,5 +1,8 @@
 export K6_VERSION=v0.40.0
 export K6_LOCATION?=$(GOPATH)/bin/k6
+REPO=github.com/leonyork/xk6-output-timestream
+ENV=dev
+IMAGE_NAME=k6
 
 .PHONY: build
 build:
@@ -9,21 +12,37 @@ build:
 test-unit:
 	go test
 
-K6_TIMESTREAM_DATABASE_NAME=test
-K6_TIMESTREAM_TABLE_NAME=test
-K6_USER_COUNT=2
-K6_ITERATIONS=4
+export K6_TIMESTREAM_DATABASE_NAME=dev-xk6-output-timestream-test
+export K6_TIMESTREAM_TABLE_NAME=test
+export K6_VUS=100
+export K6_ITERATIONS=400
 
-K6_TEST_CMD=K6_TIMESTREAM_DATABASE_NAME=$(K6_TIMESTREAM_DATABASE_NAME) \
-	K6_TIMESTREAM_TABLE_NAME=$(K6_TIMESTREAM_TABLE_NAME) \
-	k6 run test/test.js \
-	-u $(K6_USER_COUNT) \
-	-i $(K6_ITERATIONS) \
-	-o timestream \
-	--verbose
+AWS_CONFIG_FILE?=$(HOME)/.aws
+# If we're running inside a dev container, we're
+# using the host's docker, and so need to mount
+# the host's AWS config
+ifneq ($(HOST_AWS_CONFIG_FILE),)
+	AWS_CONFIG_FILE=$(HOST_AWS_CONFIG_FILE)
+endif
+TEST_IMAGE_NAME:=$(IMAGE_NAME)_test
 .PHONY: test-integration
-test-integration: build
-	$(K6_TEST_CMD)
+test-integration:
+	docker build -t $(TEST_IMAGE_NAME) --build-arg K6_IMAGE=$(FULL_IMAGE_NAME) $(CURDIR)/test
+	docker run -e K6_TIMESTREAM_DATABASE_NAME -e K6_TIMESTREAM_TABLE_NAME -e K6_VUS -e K6_ITERATIONS -v "$(AWS_CONFIG_FILE)":"/home/k6/.aws" $(TEST_IMAGE_NAME)
+
+INFRA_STACK_NAME:=dev-xk6-output-timestream-test
+INFRA_STACK_PARAMETERS:="DatabaseName"="$(K6_TIMESTREAM_DATABASE_NAME)" \
+	"TableName"="$(K6_TIMESTREAM_TABLE_NAME)"
+INFRA_STACK_TAGS="Repo=$(REPO)" "Env=$(ENV)"
+.PHONY: deploy-infra
+deploy-infra:
+	aws cloudformation deploy --template-file test/infra/cloudformation.yaml --stack-name $(INFRA_STACK_NAME) --tags $(INFRA_STACK_TAGS) --parameter-overrides $(INFRA_STACK_PARAMETERS)
+
+.PHONY: destroy-infra
+destroy-infra:
+	aws cloudformation delete-stack --stack-name $(INFRA_STACK_NAME)
+	aws cloudformation wait stack-delete-complete --stack-name $(INFRA_STACK_NAME)
+
 
 #################################################
 # Dev tooling (including code formatting 
@@ -102,7 +121,6 @@ build-builder:
 push-builder:
 	docker push $(BUILDER_NAME)
 
-IMAGE_NAME=k6
 # In Dockerhub the versions are without the leading 'v'
 K6_VERSION_NO_V=$(subst v,,$(K6_VERSION))
 FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)
@@ -114,7 +132,7 @@ ifneq ($(VERSION_NO_V),)
 endif
 .PHONY: build-image
 build-image: 
-	docker build --target k6 --build-arg K6_VERSION=$(K6_VERSION_NO_V) --build-arg VERSION=$(VERSION) $(CACHE_CMD) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
+	docker build --target k6 --build-arg K6_VERSION=$(K6_VERSION_NO_V) --build-arg VERSION=$(VERSION) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
 
 .PHONY: push-image
 push-image:

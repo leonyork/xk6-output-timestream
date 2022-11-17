@@ -12,7 +12,8 @@
   "containerEnv": {
     // Means that default region is loaded from the ~/.aws/config file.
     // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-region.html
-    "AWS_SDK_LOAD_CONFIG": "true"
+    "AWS_SDK_LOAD_CONFIG": "true",
+    "HOST_AWS_CONFIG_FILE": "${localEnv:HOME}${localEnv:USERPROFILE}/.aws"
   },
 
   // Set *default* container specific settings.json values on container create.

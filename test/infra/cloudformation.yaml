@@ -1,0 +1,23 @@
+Parameters:
+  DatabaseName:
+    Type: String
+  TableName:
+    Type: String
+Resources:
+  TimestreamDatabase:
+    Type: AWS::Timestream::Database
+    Properties:
+      DatabaseName: !Ref DatabaseName
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+  TimestreamTable:
+    Type: AWS::Timestream::Table
+    Properties:
+      DatabaseName: !Ref DatabaseName
+      TableName: !Ref TableName
+      RetentionProperties:
+        MemoryStoreRetentionPeriodInHours: 1
+        MagneticStoreRetentionPeriodInDays: 1
+    DependsOn: TimestreamDatabase
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
