@@ -126,7 +126,7 @@ image-name:
 
 .PHONY: update-changelog
 update-changelog:
-	echo '\nTo pull the image for this release, run\n\n`docker pull $(shell make image-name)`' >> CHANGELOG.md
+	echo '\nTo pull the image for this release, run\n\n`docker pull $(FULL_IMAGE_NAME)`' >> CHANGELOG.md
 
 .PHONY: copy-k6-from-image
 copy-k6-from-image:
