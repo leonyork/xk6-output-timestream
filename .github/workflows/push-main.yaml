@@ -26,6 +26,19 @@ jobs:
     needs:
       - prepare
 
+  integration:
+    uses: ./.github/workflows/_integration.yaml
+    with:
+      image: ${{ needs.build.outputs.image }}
+      # Seems to need the CI container on Github Actions rather
+      # than just the builder image :(
+      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+    needs:
+      - prepare
+      - build
+
   release:
     uses: ./.github/workflows/_release.yaml
     with:
@@ -36,3 +49,4 @@ jobs:
       - prepare
       - build
       - validate
+      - integration

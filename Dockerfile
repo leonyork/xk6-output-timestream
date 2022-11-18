@@ -16,6 +16,29 @@ RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
 #################################################
 FROM builder AS ci
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Docker CLI for integration tests
+RUN apt-get update \ 
+  && apt-get install -y \
+  gnupg=2.2.12-1+deb10u2 \
+  lsb-release=10.2019051400 \
+  --no-install-recommends \
+  && mkdir -p /etc/apt/keyrings \
+  && curl -fsSL https://download.docker.com/linux/debian/gpg | \
+  gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+  && echo \
+  "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | \
+  tee /etc/apt/sources.list.d/docker.list >/dev/null \
+  && apt-get update \
+  && apt-get install -y \
+  docker-ce-cli=5:18.09.0~3-0~debian-buster \
+  --no-install-recommends \
+  && apt-get clean
+
 # AWS CLI for integration tests
 RUN apt-get update \ 
   && apt-get install -y \
@@ -41,7 +64,6 @@ RUN curl -fsSL \
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.5.1 \
   && go install github.com/segmentio/golines@v0.9.0
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Node for prettier
 # hadolint ignore=DL3009
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x \

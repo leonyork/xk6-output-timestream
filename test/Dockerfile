@@ -1,9 +1,10 @@
-ARG K6_IMAGE=k6
-FROM $K6_IMAGE
+FROM golang:1.19.3-buster
 
-ARG TEST_FILE=test.js
-COPY $TEST_FILE .
+WORKDIR /app
+COPY go.mod go.sum ./
 
-ENV K6_TIMESTREAM_DATABASE_NAME K6_TIMESTREAM_TABLE_NAME
+RUN go mod download
 
-CMD [ "run", "test.js", "-o", "timestream", "--verbose"]
+COPY *.go ./
+
+CMD [ "go", "test", "-count=1" ]

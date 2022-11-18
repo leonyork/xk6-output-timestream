@@ -3,6 +3,7 @@ package timestream
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -20,12 +21,17 @@ func TestResults(t *testing.T) {
 		t.Error(err)
 	}
 
+	query := fmt.Sprintf(
+		"SELECT CAST(SUM(measure_value::double) AS INT) FROM \"%s\".\"%s\" WHERE measure_name = 'http_reqs'",
+		os.Getenv("K6_TIMESTREAM_DATABASE_NAME"),
+		os.Getenv("K6_TIMESTREAM_TABLE_NAME"),
+	)
+	t.Log(query)
+
 	results, err := client.Query(
 		context.TODO(),
 		&timestreamquery.QueryInput{
-			QueryString: aws.String(
-				"SELECT CAST(SUM(measure_value::double) AS INT) FROM \"dev-xk6-output-timestream-test\".\"test\" WHERE measure_name = 'http_reqs'",
-			),
+			QueryString: aws.String(query),
 		})
 
 	if err != nil {

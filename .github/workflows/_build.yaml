@@ -8,6 +8,10 @@ on:
       builder_image:
         type: string
         required: true
+    outputs:
+      image:
+        description: The built image
+        value: ${{ jobs.build.outputs.image }}
 
 jobs:
   build:
@@ -15,6 +19,8 @@ jobs:
     permissions:
       contents: "read"
       packages: "write"
+    outputs:
+      image: ${{ steps.set_image_name.outputs.image }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -27,9 +33,13 @@ jobs:
       - name: Pull builder
         shell: bash
         run: docker pull ${{ inputs.builder_image }}
+      - name: Set image name
+        id: set_image_name
+        shell: bash
+        run: echo "image=$(echo ghcr.io/${{ github.repository_owner }}/k6:${{ inputs.git_ref || github.sha }})" >> $GITHUB_OUTPUT
       - run: |
           make \
-            FULL_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6:${{ inputs.git_ref || github.sha }} \
+            FULL_IMAGE_NAME=${{ steps.set_image_name.outputs.image }} \
             CACHE_NAME=${{ inputs.builder_image }} \
             build-image \
             push-image \

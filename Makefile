@@ -1,7 +1,7 @@
 export K6_VERSION=v0.40.0
 export K6_LOCATION?=$(GOPATH)/bin/k6
 REPO=github.com/leonyork/xk6-output-timestream
-ENV=dev
+ENV?=dev
 IMAGE_NAME=k6
 
 .PHONY: build
@@ -12,10 +12,10 @@ build:
 test-unit:
 	go test
 
-export K6_TIMESTREAM_DATABASE_NAME=dev-xk6-output-timestream-test
-export K6_TIMESTREAM_TABLE_NAME=test
-export K6_VUS=100
-export K6_ITERATIONS=400
+export K6_TIMESTREAM_DATABASE_NAME?=dev-xk6-output-timestream-test
+export K6_TIMESTREAM_TABLE_NAME?=test
+export K6_VUS?=100
+export K6_ITERATIONS?=400
 
 AWS_CONFIG_FILE?=$(HOME)/.aws
 # If we're running inside a dev container, we're
@@ -25,20 +25,26 @@ ifneq ($(HOST_AWS_CONFIG_FILE),)
 	AWS_CONFIG_FILE=$(HOST_AWS_CONFIG_FILE)
 endif
 TEST_IMAGE_NAME:=$(IMAGE_NAME)_test
+DOCKER_AWS_ARGS:=-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION -e AWS_ROLE_ARN -e AWS_ROLE_SESSION_NAME -e AWS_SESSION_TOKEN
+DOCKER_K6_ARGS:=-e K6_TIMESTREAM_DATABASE_NAME -e K6_TIMESTREAM_TABLE_NAME -e K6_VUS -e K6_ITERATIONS
 .PHONY: test-integration
 test-integration:
-	docker build -t $(TEST_IMAGE_NAME) --build-arg K6_IMAGE=$(FULL_IMAGE_NAME) $(CURDIR)/test
-	docker run -e K6_TIMESTREAM_DATABASE_NAME -e K6_TIMESTREAM_TABLE_NAME -e K6_VUS -e K6_ITERATIONS -v "$(AWS_CONFIG_FILE)":"/home/k6/.aws" $(TEST_IMAGE_NAME)
-	go test ./test -count=1
+	docker build -t $(TEST_IMAGE_NAME) --build-arg K6_IMAGE=$(FULL_IMAGE_NAME) --quiet --file test/test.Dockerfile $(CURDIR)/test
+	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -v "$(AWS_CONFIG_FILE)":"/home/k6/.aws" $(TEST_IMAGE_NAME)
+	docker build -t $(TEST_IMAGE_NAME) --quiet $(CURDIR)/test
+	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -v "$(AWS_CONFIG_FILE)":"/root/.aws" $(TEST_IMAGE_NAME)
 
-
-INFRA_STACK_NAME:=dev-xk6-output-timestream-test
-INFRA_STACK_PARAMETERS:="DatabaseName"="$(K6_TIMESTREAM_DATABASE_NAME)" \
+INFRA_STACK_NAME?=dev-xk6-output-timestream-test
+INFRA_STACK_PARAMETERS="DatabaseName"="$(K6_TIMESTREAM_DATABASE_NAME)" \
 	"TableName"="$(K6_TIMESTREAM_TABLE_NAME)"
 INFRA_STACK_TAGS="Repo=$(REPO)" "Env=$(ENV)"
+
+ifneq ($(INFRA_ROLE_ARN),)
+	ROLE_ARN_ARG=--role-arn $(INFRA_ROLE_ARN)
+endif
 .PHONY: deploy-infra
 deploy-infra:
-	aws cloudformation deploy --template-file test/infra/cloudformation.yaml --stack-name $(INFRA_STACK_NAME) --tags $(INFRA_STACK_TAGS) --parameter-overrides $(INFRA_STACK_PARAMETERS)
+	aws cloudformation deploy --template-file test/infra/cloudformation.yaml --stack-name $(INFRA_STACK_NAME) --tags $(INFRA_STACK_TAGS) --parameter-overrides $(INFRA_STACK_PARAMETERS) $(ROLE_ARN_ARG)
 
 .PHONY: destroy-infra
 destroy-infra:
@@ -106,6 +112,7 @@ check-all:
 # Targets that are mainly run from CI
 #################################################
 
+BUILDER_NAME?=builder
 .PHONY: pull-builder
 pull-builder:
 	-docker pull $(BUILDER_NAME)

@@ -74,7 +74,9 @@ The integration tests work by creating a Timestream database and table, running 
     Client--build-->k6;
     Client--run-->k6;
     k6--write-->Timestream;
-    Client--query-->Timestream;
+    Client--build-->Tests;
+    Client--run-->Tests;
+    Tests--query-->Timestream;
     Client--destroy-->Timestream;
 ```
 
