@@ -14,7 +14,13 @@ For more information see [the alternatives](docs/Alternatives.md)
 
 ## Usage
 
-This output is written as an extension to K6 using [xk6 extensions](https://github.com/grafana/xk6) - this is **experimental**. You'll need to build this into K6 - see [the custom build instructions](https://github.com/grafana/xk6#custom-builds).
+This output is written as an extension to K6 using [xk6 extensions](https://github.com/grafana/xk6) - this is **experimental**.
+
+You can use this extension by either:
+
+- Taking the k6 executable from [the latest release](https://github.com/leonyork/xk6-output-timestream/releases) and following the [instructions on running k6](https://k6.io/docs/get-started/running-k6/).
+- Using the Docker image from [the latest release](https://github.com/leonyork/xk6-output-timestream/releases) and following the [instructions on running k6](https://k6.io/docs/get-started/running-k6/).
+- Building this extension into K6 - see [the custom build instructions](https://github.com/grafana/xk6#custom-builds).
 
 ### Configuration
 
@@ -65,7 +71,7 @@ There are targets for different development tasks in [the Makefile](Makefile).
 The integration tests work by creating a Timestream database and table, running a load test (with a built in test script) and then checking the results.
 
 ```mermaid
-graph LR;
+  graph LR;
     Client--deploy-->Timestream;
     Client--build-->k6;
     Client--run-->k6;
