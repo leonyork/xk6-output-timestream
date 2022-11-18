@@ -33,8 +33,6 @@ K6_TIMESTREAM_DATABASE_NAME
 K6_TIMESTREAM_TABLE_NAME
 ```
 
-There is a sample command in the `test-integration` target in [the Makefile](Makefile).
-
 You'll also need to setup your AWS credentials - see [the guide on how to do this](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials).
 
 ### Tags
