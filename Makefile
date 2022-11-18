@@ -29,6 +29,8 @@ TEST_IMAGE_NAME:=$(IMAGE_NAME)_test
 test-integration:
 	docker build -t $(TEST_IMAGE_NAME) --build-arg K6_IMAGE=$(FULL_IMAGE_NAME) $(CURDIR)/test
 	docker run -e K6_TIMESTREAM_DATABASE_NAME -e K6_TIMESTREAM_TABLE_NAME -e K6_VUS -e K6_ITERATIONS -v "$(AWS_CONFIG_FILE)":"/home/k6/.aws" $(TEST_IMAGE_NAME)
+	go test ./test -count=1
+
 
 INFRA_STACK_NAME:=dev-xk6-output-timestream-test
 INFRA_STACK_PARAMETERS:="DatabaseName"="$(K6_TIMESTREAM_DATABASE_NAME)" \
