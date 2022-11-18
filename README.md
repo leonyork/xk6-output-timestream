@@ -57,3 +57,27 @@ If you don't want to use dev containers, you'll need to make sure you install th
 [output.go](output.go) contains the logic for converting from K6 metric samples to AWS Timestream records and then saving those records.
 
 There are targets for different development tasks in [the Makefile](Makefile).
+
+### Testing
+
+#### Integration
+
+The integration tests work by creating a Timestream database and table, running a load test (with a built in test script) and then checking the results.
+
+```mermaid
+graph LR;
+    Client--deploy-->Timestream;
+    Client--build-->k6;
+    Client--run-->k6;
+    k6--write-->Timestream;
+    Client--query-->Timestream;
+    Client--destroy-->Timestream;
+```
+
+To run the integration tests you'll need to setup AWS credentials - see [the guide on how to do this](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials).
+
+To deploy the Timestream database run `make deploy-infra`.
+
+To run the tests (build, run and query steps above) run `make test-integration`.
+
+To destroy the Timestream database run `make destroy-infra`.
