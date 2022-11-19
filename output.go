@@ -10,7 +10,6 @@ package timestream
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 	"sync"
 	"time"
@@ -53,12 +52,12 @@ type Output struct {
 func New(params output.Params) (output.Output, error) {
 	extensionConfig, err := GetConsolidatedConfig(params.JSONConfig)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	awsConfig, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	client := timestreamwrite.NewFromConfig(awsConfig)
@@ -67,7 +66,7 @@ func New(params output.Params) (output.Output, error) {
 		params: params,
 		client: client,
 		config: &extensionConfig,
-		logger: params.Logger,
+		logger: params.Logger.WithField("component", "timestream"),
 	}, nil
 }
 
