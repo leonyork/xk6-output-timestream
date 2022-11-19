@@ -84,6 +84,6 @@ To run the integration tests you'll need to setup AWS credentials - see [the gui
 
 To deploy the Timestream database run `make deploy-infra`.
 
-To run the tests (build, run and query steps above) run `make test-integration`.
+To run the tests (build, run and query steps above) run `make test-integration`. Note that you will need to build the k6 image first with `make build-image`.
 
 To destroy the Timestream database run `make destroy-infra`.
