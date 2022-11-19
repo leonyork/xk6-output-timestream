@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -38,8 +39,14 @@ func TestResults(t *testing.T) {
 		t.Error(err)
 	}
 
+	result, err := strconv.Atoi(*results.Rows[0].Data[0].ScalarValue)
+	if err != nil {
+		t.Error(err)
+	}
 	//K6_ITERATIONS=400 with one http request per iteration, so expect 400 http requests
-	assert.Equal(t, *results.Rows[0].Data[0].ScalarValue, fmt.Sprint(400))
+	// but give a generous margin of - 5 for network/timestream errors.
+	assert.GreaterOrEqual(t, result, 395)
+	assert.LessOrEqual(t, result, 400)
 }
 
 func initTimestream() (*timestreamquery.Client, error) {
