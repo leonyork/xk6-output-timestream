@@ -1,4 +1,4 @@
-export K6_VERSION=v0.40.0
+export K6_VERSION=v0.41.0
 export K6_LOCATION?=$(GOPATH)/bin/k6
 REPO=github.com/leonyork/xk6-output-timestream
 ENV?=dev
