@@ -55,7 +55,7 @@ RUN apt-get update \
 
 # Hadolint for linting Dockerfile
 RUN curl -fsSL \
-  https://github.com/hadolint/hadolint/releases/download/v2.10.0/hadolint-Linux-x86_64 \
+  https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
   -o /usr/local/bin/hadolint \
   && chmod +x /usr/local/bin/hadolint
 
