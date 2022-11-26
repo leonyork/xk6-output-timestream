@@ -58,7 +58,8 @@
     "foxundermoon.shell-format",
     "exiasr.hadolint",
     "ms-azuretools.vscode-docker",
-    "DavidAnson.vscode-markdownlint"
+    "DavidAnson.vscode-markdownlint",
+    "vivaxy.vscode-conventional-commits"
   ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
