@@ -1,7 +1,12 @@
-name: Build on Push (main)
+name: Build on Push (branch) or PR (main)
 on:
-  push:
+  pull_request:
     branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  push:
+    branches-ignore:
       - main
     paths-ignore:
       - "**.md"
@@ -36,15 +41,3 @@ jobs:
     needs:
       - prepare
       - build
-
-  release:
-    uses: ./.github/workflows/_release.yaml
-    with:
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-    secrets:
-      SSH_KEY_GITHUB: ${{ secrets.SSH_KEY_GITHUB }}
-    needs:
-      - prepare
-      - build
-      - validate
-      - integration
