@@ -1,12 +1,7 @@
-name: Build on Push (branch) or PR (main)
+name: Build on PR (main)
 on:
   pull_request:
     branches:
-      - main
-    paths-ignore:
-      - "**.md"
-  push:
-    branches-ignore:
       - main
     paths-ignore:
       - "**.md"
