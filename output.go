@@ -141,8 +141,9 @@ func (o *Output) createRecords(samples []metrics.Sample) []types.Record {
 	for _, sample := range samples {
 		var dimensions []types.Dimension
 
-		for tagKey, tagValue := range sample.Tags.Map() {
+		for tagKey, tagValue := range sample.Tags.CloneTags() {
 			if len(strings.TrimSpace(tagValue)) == 0 {
+				o.logger.Debug(fmt.Sprintf("Ignoring tag %s", tagKey))
 				continue
 			}
 
