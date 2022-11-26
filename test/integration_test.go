@@ -1,11 +1,14 @@
-package timestream
+package timestream_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/timestreamquery"
@@ -14,39 +17,137 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestResults(t *testing.T) {
+type Fixture struct {
+	Query          string          `json:"query"`
+	ExpectedResult [][]TypedResult `json:"testExpectedResult"`
+	ExpectedRows   Result          `json:"testExpectedRows"`
+	ExpectedCols   int             `json:"testExpectedCols"`
+	Interval       string          `json:"testInterval"`
+}
+
+type Result struct {
+	GreaterOrEqual int `json:">="`
+	LessOrEqual    int `json:"<="`
+}
+
+type TypedResult struct {
+	Result
+	Type string `json:"type"`
+}
+
+type Fixtures map[string]Fixture
+
+func TestFixtures(t *testing.T) {
 	t.Parallel()
+
+	fixtures, err := loadFixtures("./fixtures.json")
+	if err != nil {
+		t.Error(err)
+	}
 
 	client, err := initTimestream()
 	if err != nil {
 		t.Error(err)
 	}
 
-	query := fmt.Sprintf(
-		"SELECT CAST(SUM(measure_value::double) AS INT) FROM \"%s\".\"%s\" WHERE measure_name = 'http_reqs'",
-		os.Getenv("K6_TIMESTREAM_DATABASE_NAME"),
-		os.Getenv("K6_TIMESTREAM_TABLE_NAME"),
-	)
-	t.Log(query)
+	for name, fixture := range *fixtures {
+		name := name
+		fixture := fixture
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
 
-	results, err := client.Query(
-		context.TODO(),
-		&timestreamquery.QueryInput{
-			QueryString: aws.String(query),
+			var query string
+			query = fixture.Query
+
+			if fixture.Interval != "" {
+				query = strings.Replace(query, "$__interval", fixture.Interval, -1)
+			}
+
+			query = strings.Replace(
+				strings.Replace(
+					strings.Replace(
+						query,
+						"$__filter",
+						"test_type = 'integration-test'",
+						-1,
+					),
+					"$__database",
+					os.Getenv("K6_TIMESTREAM_DATABASE_NAME"),
+					-1,
+				),
+				"$__table",
+				os.Getenv("K6_TIMESTREAM_TABLE_NAME"),
+				-1,
+			)
+			t.Log(query)
+
+			results, err := client.Query(
+				context.TODO(),
+				&timestreamquery.QueryInput{
+					QueryString: aws.String(query),
+				})
+
+			if err != nil {
+				t.Error(err)
+			}
+
+			assert.GreaterOrEqual(t, len(results.Rows), fixture.ExpectedRows.GreaterOrEqual)
+			assert.LessOrEqual(t, len(results.Rows), fixture.ExpectedRows.LessOrEqual)
+
+			for row := range fixture.ExpectedResult {
+
+				assert.Equal(t, len(results.Rows[row].Data), fixture.ExpectedCols)
+
+				for col := range fixture.ExpectedResult[row] {
+					expectedResult := fixture.ExpectedResult[row][col]
+
+					if expectedResult.Type == "INT" {
+						result, err := strconv.Atoi(*results.Rows[row].Data[col].ScalarValue)
+						if err != nil {
+							t.Error(err)
+						}
+						assert.GreaterOrEqual(t, result, expectedResult.GreaterOrEqual)
+						assert.LessOrEqual(t, result, expectedResult.LessOrEqual)
+					} else if expectedResult.Type == "TIME" {
+						isoFormat := fmt.Sprintf("%sZ", strings.Replace(*results.Rows[row].Data[col].ScalarValue, " ", "T", -1))
+						_, err := time.Parse(time.RFC3339Nano, isoFormat)
+						if err != nil {
+							t.Error(err)
+							t.Fail()
+						}
+					} else if expectedResult.Type == "DOUBLE" {
+						result, err := strconv.ParseFloat(*results.Rows[row].Data[col].ScalarValue, 64)
+						if err != nil {
+							t.Error(err)
+						}
+						assert.GreaterOrEqual(t, result, float64(expectedResult.GreaterOrEqual))
+						assert.LessOrEqual(t, result, float64(expectedResult.LessOrEqual))
+					} else {
+						t.Errorf("Unrecognised result type %s", expectedResult.Type)
+						t.Fail()
+					}
+				}
+			}
 		})
+	}
+}
 
+func loadFixtures(fileLocation string) (*Fixtures, error) {
+	file, err := os.Open(fileLocation)
 	if err != nil {
-		t.Error(err)
+		return nil, err
 	}
 
-	result, err := strconv.Atoi(*results.Rows[0].Data[0].ScalarValue)
+	decoder := json.NewDecoder(file)
+
+	var fixtures Fixtures
+
+	err = decoder.Decode(&fixtures)
 	if err != nil {
-		t.Error(err)
+		return nil, err
 	}
-	//K6_ITERATIONS=400 with one http request per iteration, so expect 400 http requests
-	// but give a generous margin of - 5 for network/timestream errors.
-	assert.GreaterOrEqual(t, result, 395)
-	assert.LessOrEqual(t, result, 400)
+
+	return &fixtures, nil
 }
 
 func initTimestream() (*timestreamquery.Client, error) {

@@ -6,6 +6,7 @@ export const options = {
   systemTags: ["status", "method", "url", "error", "error_code", "vu", "iter"],
   tags: {
     test_type: "integration-test",
+    instance_id: "1",
   },
 };
 

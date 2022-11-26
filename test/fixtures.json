@@ -1,0 +1,166 @@
+{
+  "totalNumberOfHttpRequests": {
+    "query": "SELECT CAST(SUM(measure_value::double) AS INT)\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = 'http_reqs'\nAND $__filter",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 1
+    },
+    "testExpectedCols": 1,
+    "testExpectedResult": [
+      [
+        {
+          "type": "INT",
+          ">=": 395,
+          "<=": 400
+        }
+      ]
+    ]
+  },
+  "numberOfVirtualUsersOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(vus) AS vus\nFROM (\n  SELECT time, SUM(vus) AS vus\n  FROM (\n    SELECT BIN(time, 1s) AS time, AVG(measure_value::double) AS vus, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name = 'vus'\n    AND $__filter\n    GROUP BY BIN(time, 1s), instance_id\n    ORDER BY BIN(time, 1s) DESC\n  )\n  GROUP BY time\n)\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 1,
+          "<=": 100
+        }
+      ]
+    ]
+  },
+  "numberOfInstancesOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(instance_count) AS instance_count\nFROM (\n  SELECT BIN(time, 1s) AS time, COUNT(DISTINCT(instance_id)) AS instance_count\n  FROM \"$__database\".\"$__table\"\n  WHERE measure_name = 'vus'\n  AND $__filter\n  GROUP BY BIN(time, 1s)\n  ORDER BY BIN(time, 1s) DESC\n  )\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 1,
+          "<=": 1
+        }
+      ]
+    ]
+  },
+  "numberOfActiveUsersOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(vus) AS active_vus\nFROM (\n  SELECT time, SUM(vus) AS vus\n  FROM (\n    SELECT BIN(time, 10s) AS time, COUNT(DISTINCT(vu)) AS vus, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name IN ('data_sent', 'data_received')\n    AND $__filter\n    GROUP BY BIN(time, 10s), instance_id\n    ORDER BY BIN(time, 10s) DESC\n  )\n  GROUP BY time\n)\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 1,
+          "<=": 100
+        }
+      ]
+    ]
+  },
+  "dataReceivedOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(data_received) AS data_received_per_s\nFROM (\n  SELECT time, SUM(data_received) AS data_received\n  FROM (\n    SELECT BIN(time, 1s) AS time, SUM(measure_value::double) AS data_received, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name = 'data_received'\n    AND $__filter\n    GROUP BY BIN(time, 1s), instance_id\n    ORDER BY BIN(time, 1s) DESC\n  )\n  GROUP BY time\n)\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 0,
+          "<=": 999999999
+        }
+      ]
+    ]
+  },
+  "httpRequestsOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(http_reqs) AS http_reqs_per_s\nFROM (\n  SELECT time, SUM(http_reqs) AS http_reqs\n  FROM (\n    SELECT BIN(time, 1s) AS time, SUM(measure_value::double) AS http_reqs, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name = 'http_reqs'\n    AND $__filter\n    GROUP BY BIN(time, 1s), instance_id\n    ORDER BY BIN(time, 1s) DESC\n  )\n  GROUP BY time\n)\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 0,
+          "<=": 400
+        }
+      ]
+    ]
+  },
+  "httpRequestsFailedOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(http_req_failed) AS http_req_failed_per_s\nFROM (\n  SELECT success.time, ROUND(AVG(fail_ratio.http_req_failed * success.http_reqs), 0) AS http_req_failed\n  FROM (\n    SELECT BIN(time, 1s) AS time, SUM(measure_value::double) AS http_reqs, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name = 'http_reqs'\n    AND $__filter\n    GROUP BY BIN(time, 1s), instance_id\n    ORDER BY BIN(time, 1s) DESC\n  ) AS success,\n  (\n    SELECT BIN(time, 1s) AS time, AVG(measure_value::double) AS http_req_failed, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name = 'http_req_failed'\n    AND $__filter\n    GROUP BY BIN(time, 1s), instance_id\n    ORDER BY BIN(time, 1s) DESC\n  ) AS fail_ratio\n  WHERE fail_ratio.time = success.time\n  GROUP BY success.time\n)\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 0,
+          "<=": 10
+        }
+      ]
+    ]
+  },
+  "httpRequestDurationsOverTime": {
+    "query": "SELECT BIN(time, $__interval) AS time, AVG(http_req_duration) AS http_req_duration\nFROM (\n  SELECT time, AVG(http_req_duration) AS http_req_duration\n  FROM (\n    SELECT BIN(time, 1s) AS time, AVG(measure_value::double) AS http_req_duration, instance_id\n    FROM \"$__database\".\"$__table\"\n    WHERE measure_name = 'http_req_duration'\n    AND $__filter\n    GROUP BY BIN(time, 1s), instance_id\n    ORDER BY BIN(time, 1s) DESC\n  )\n  GROUP BY time\n)\nGROUP BY BIN(time, $__interval)",
+    "testInterval": "1m",
+    "testExpectedRows": {
+      ">=": 1,
+      "<=": 2
+    },
+    "testExpectedCols": 2,
+    "testExpectedResult": [
+      [
+        {
+          "type": "TIME"
+        },
+        {
+          "type": "DOUBLE",
+          ">=": 1,
+          "<=": 1000
+        }
+      ]
+    ]
+  }
+}
