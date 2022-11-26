@@ -4,6 +4,9 @@ REPO=github.com/leonyork/xk6-output-timestream
 ENV?=dev
 IMAGE_NAME=k6
 
+.PHONY: all
+all: build test-unit format check build-image deploy-infra test-integration destroy-infra
+
 .PHONY: build
 build:
 	xk6 build $(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
