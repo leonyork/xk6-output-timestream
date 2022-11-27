@@ -1,0 +1,21 @@
+apiVersion: 1
+
+deleteDatasources:
+  - name: Amazon Timestream
+    orgId: 1
+
+datasources:
+  - name: Amazon Timestream
+    type: grafana-timestream-datasource
+    access: proxy
+    url:
+    user:
+    basicAuth: false
+    isDefault: true
+    jsonData:
+      authType: default
+      defaultRegion: us-east-1
+      defaultDatabase: dev-xk6-output-timestream-test
+      defaultTable: test
+    version: 1
+    readonly: true

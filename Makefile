@@ -54,6 +54,9 @@ destroy-infra:
 	aws cloudformation delete-stack --stack-name $(INFRA_STACK_NAME)
 	aws cloudformation wait stack-delete-complete --stack-name $(INFRA_STACK_NAME)
 
+.PHONY: run-grafana
+run-grafana:
+	make K6_TIMESTREAM_DATABASE_NAME=$(K6_TIMESTREAM_DATABASE_NAME) K6_TIMESTREAM_TABLE_NAME=$(K6_TIMESTREAM_TABLE_NAME) -C grafana run-grafana
 
 #################################################
 # Dev tooling (including code formatting 
