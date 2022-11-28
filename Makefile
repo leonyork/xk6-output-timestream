@@ -53,10 +53,7 @@ deploy-infra:
 destroy-infra:
 	aws cloudformation delete-stack --stack-name $(INFRA_STACK_NAME)
 	aws cloudformation wait stack-delete-complete --stack-name $(INFRA_STACK_NAME)
-
-.PHONY: run-grafana
-run-grafana:
-	make K6_TIMESTREAM_DATABASE_NAME=$(K6_TIMESTREAM_DATABASE_NAME) K6_TIMESTREAM_TABLE_NAME=$(K6_TIMESTREAM_TABLE_NAME) -C grafana run-grafana
+	
 
 #################################################
 # Dev tooling (including code formatting 
@@ -189,3 +186,21 @@ release-github:
 	gh release create $(VERSION) \
     '$(K6_LOCATION)#K6 x86_64 executable with timestream' \
     -F CHANGELOG.md
+
+#################################################
+# Example grafana setup
+# Run `make grafana-{target}` to run any of the 
+# targets in ./grafana/Makefile 
+# e.g. `make grafana-build`
+#################################################
+
+GRAFANA_ARGS:=K6_TIMESTREAM_DATABASE_NAME=$(K6_TIMESTREAM_DATABASE_NAME) \
+	K6_TIMESTREAM_TABLE_NAME=$(K6_TIMESTREAM_TABLE_NAME) \
+	$(if $(GRAFANA_IMAGE_NAME),IMAGE_NAME=$(GRAFANA_IMAGE_NAME),) \
+	$(if $(GRAFANA_FULL_IMAGE_NAME),FULL_IMAGE_NAME=$(GRAFANA_FULL_IMAGE_NAME),) \
+	$(if $(CACHE_NAME),CACHE_NAME=$(CACHE_NAME),) \
+	VERSION=$(VERSION)
+
+.PHONY: grafana-%
+grafana-%:
+	make $(GRAFANA_ARGS) -C grafana $*

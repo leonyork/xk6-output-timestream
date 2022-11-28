@@ -64,6 +64,22 @@ jobs:
             IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
             VERSION=${{ github.ref_name }} \
             update-changelog
+      - name: Pull built CI grafana image to cache
+        run: docker pull ghcr.io/${{ github.repository_owner }}/grafana-oss:${{ github.sha }}
+      - name: Tag cached grafana image
+        run: |
+          make \
+            GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
+            VERSION=${{ github.ref_name }} \
+            CACHE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss:${{ github.sha }} \
+            grafana-tag-cached-image \
+            grafana-push-image
+      - name: Update changelog with tagged grafana image
+        run: |
+          make \
+            GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
+            VERSION=${{ github.ref_name }} \
+            grafana-update-changelog
       - run: make VERSION=${{ github.ref_name }} release-github
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -26,6 +26,9 @@ jobs:
     needs:
       - prepare
 
+  build-grafana:
+    uses: ./.github/workflows/_build-grafana.yaml
+
   integration:
     uses: ./.github/workflows/_integration.yaml
     with:

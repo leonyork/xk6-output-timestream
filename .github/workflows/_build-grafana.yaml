@@ -1,0 +1,36 @@
+name: Build Grafana
+on:
+  workflow_call:
+    inputs:
+      git_ref:
+        type: string
+        required: false
+    outputs:
+      image:
+        description: The built image
+        value: ${{ jobs.build.outputs.image }}
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: "read"
+      packages: "write"
+    outputs:
+      image: ${{ steps.set_image_name.outputs.image }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.git_ref }}
+      - name: Login ghcr.io
+        shell: bash
+        run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+      - name: Set image name
+        id: set_image_name
+        shell: bash
+        run: echo "image=$(echo ghcr.io/${{ github.repository_owner }}/grafana-oss:${{ inputs.git_ref || github.sha }})" >> $GITHUB_OUTPUT
+      - run: |
+          make \
+            GRAFANA_FULL_IMAGE_NAME=${{ steps.set_image_name.outputs.image }} \
+            grafana-build \
+            grafana-push-image
