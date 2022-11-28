@@ -606,7 +606,7 @@
           "measure": "$Measurement",
           "rawQuery": "SELECT AVG(measure_value::double) AS $__measure\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
           "refId": "A",
-          "table": "test"
+          "table": "\"$Table\""
         }
       ],
       "title": "$Measurement (mean)",
@@ -919,7 +919,7 @@
           "measure": "$Measurement",
           "rawQuery": "SELECT APPROX_PERCENTILE(measure_value::double, 0.9) AS $__measure\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
           "refId": "A",
-          "table": "test"
+          "table": "\"$Table\""
         }
       ],
       "title": "$Measurement (p90)",
@@ -997,7 +997,7 @@
           "measure": "$Measurement",
           "rawQuery": "SELECT APPROX_PERCENTILE(measure_value::double, 0.95) AS $__measure\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
           "refId": "A",
-          "table": "test"
+          "table": "\"$Table\""
         }
       ],
       "title": "$Measurement (p95)",
