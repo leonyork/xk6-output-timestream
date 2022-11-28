@@ -597,14 +597,14 @@
       "pluginVersion": "9.2.6",
       "targets": [
         {
-          "database": "$Database",
+          "database": "\"$Database\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
             "uid": "${grafana-timestream-datasource}"
           },
           "hide": false,
           "measure": "$Measurement",
-          "rawQuery": "SELECT AVG(measure_value::double) AS $__measure\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
+          "rawQuery": "SELECT AVG(measure_value::double) AS $__measure\nFROM $__database.$__table\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
           "refId": "A",
           "table": "\"$Table\""
         }
@@ -910,14 +910,14 @@
       "pluginVersion": "9.2.6",
       "targets": [
         {
-          "database": "$Database",
+          "database": "\"$Database\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
             "uid": "${grafana-timestream-datasource}"
           },
           "hide": false,
           "measure": "$Measurement",
-          "rawQuery": "SELECT APPROX_PERCENTILE(measure_value::double, 0.9) AS $__measure\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
+          "rawQuery": "SELECT APPROX_PERCENTILE(measure_value::double, 0.9) AS $__measure\nFROM $__database.$__table\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
           "refId": "A",
           "table": "\"$Table\""
         }
@@ -988,14 +988,14 @@
       "pluginVersion": "9.2.6",
       "targets": [
         {
-          "database": "$Database",
+          "database": "\"$Database\"",
           "datasource": {
             "type": "grafana-timestream-datasource",
             "uid": "${grafana-timestream-datasource}"
           },
           "hide": false,
           "measure": "$Measurement",
-          "rawQuery": "SELECT APPROX_PERCENTILE(measure_value::double, 0.95) AS $__measure\nFROM \"$__database\".\"$__table\"\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
+          "rawQuery": "SELECT APPROX_PERCENTILE(measure_value::double, 0.95) AS $__measure\nFROM $__database.$__table\nWHERE measure_name = '$__measure'\nAND $__timeFilter\nAND $Filter LIKE '$FilterValue'",
           "refId": "A",
           "table": "\"$Table\""
         }
