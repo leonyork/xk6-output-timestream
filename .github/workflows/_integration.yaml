@@ -11,11 +11,15 @@ on:
       image:
         type: string
         required: true
+      region:
+        type: string
+        required: false
     secrets:
       AWS_ROLE_ARN:
         required: true
 
 env:
+  K6_TIMESTREAM_REGION: ${{ inputs.region }}
   K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git_ref  || github.sha }}
   K6_TIMESTREAM_TABLE_NAME: test
   INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git_ref  || github.sha }}
@@ -43,7 +47,10 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
+      - run: make AWS_REGION=${K6_TIMESTREAM_REGION} deploy-infra
+        if: "${{ env.K6_TIMESTREAM_REGION != '' }}"
       - run: make deploy-infra
+        if: "${{ env.K6_TIMESTREAM_REGION == '' }}"
 
   test:
     runs-on: ubuntu-22.04
@@ -81,7 +88,10 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
+      - run: make AWS_REGION=${K6_TIMESTREAM_REGION} destroy-infra
+        if: "${{ env.K6_TIMESTREAM_REGION != '' }}"
       - run: make destroy-infra
+        if: "${{ env.K6_TIMESTREAM_REGION == '' }}"
     needs:
       - deploy-infra
       - test

@@ -9,6 +9,7 @@ import (
 )
 
 type Config struct {
+	Region       string `json:"region"       envconfig:"K6_TIMESTREAM_REGION"`
 	DatabaseName string `json:"databaseName" envconfig:"K6_TIMESTREAM_DATABASE_NAME"`
 	TableName    string `json:"tableName"    envconfig:"K6_TIMESTREAM_TABLE_NAME"`
 
@@ -23,6 +24,9 @@ func NewConfig() Config {
 }
 
 func (c Config) apply(cfg Config) Config {
+	if len(cfg.Region) > 0 {
+		c.Region = cfg.Region
+	}
 	if len(cfg.DatabaseName) > 0 {
 		c.DatabaseName = cfg.DatabaseName
 	}

@@ -155,6 +155,10 @@ func initTimestream() (*timestreamquery.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	regionOverride := os.Getenv("K6_TIMESTREAM_REGION")
+	if regionOverride != "" {
+		awsConfig.Region = regionOverride
+	}
 
 	client := timestreamquery.NewFromConfig(awsConfig)
 	return client, nil

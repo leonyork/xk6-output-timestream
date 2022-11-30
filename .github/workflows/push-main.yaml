@@ -40,6 +40,18 @@ jobs:
       - prepare
       - build
 
+  integration-cross-region:
+    uses: ./.github/workflows/_integration.yaml
+    with:
+      image: ${{ needs.build.outputs.image }}
+      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
+      region: eu-west-1
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+    needs:
+      - prepare
+      - build
+
   release:
     uses: ./.github/workflows/_release.yaml
     with:
@@ -51,3 +63,4 @@ jobs:
       - build
       - validate
       - integration
+      - integration-cross-region

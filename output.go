@@ -59,6 +59,9 @@ func New(params output.Params) (output.Output, error) {
 	if err != nil {
 		return nil, err
 	}
+	if extensionConfig.Region != "" {
+		awsConfig.Region = extensionConfig.Region
+	}
 
 	client := timestreamwrite.NewFromConfig(awsConfig)
 
