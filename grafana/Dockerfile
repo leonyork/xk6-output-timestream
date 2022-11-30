@@ -1,5 +1,5 @@
-ARG GRAFANA_VERSION=9.2.6
-FROM grafana/grafana-oss:9.2.6
+ARG GRAFANA_VERSION=9.3.0
+FROM grafana/grafana-oss:${GRAFANA_VERSION}
 
 RUN grafana-cli --pluginsDir "${GF_PATHS_PLUGINS}" plugins install grafana-timestream-datasource
 COPY provisioning/datasources/* /etc/grafana/provisioning/datasources/
