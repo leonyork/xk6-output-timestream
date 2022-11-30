@@ -594,7 +594,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.6",
+      "pluginVersion": "9.3.0",
       "targets": [
         {
           "database": "\"$Database\"",
@@ -672,7 +672,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.6",
+      "pluginVersion": "9.3.0",
       "targets": [
         {
           "database": "\"$Database\"",
@@ -751,7 +751,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.6",
+      "pluginVersion": "9.3.0",
       "targets": [
         {
           "database": "\"$Database\"",
@@ -829,7 +829,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.6",
+      "pluginVersion": "9.3.0",
       "targets": [
         {
           "database": "\"$Database\"",
@@ -907,7 +907,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.6",
+      "pluginVersion": "9.3.0",
       "targets": [
         {
           "database": "\"$Database\"",
@@ -985,7 +985,7 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "9.2.6",
+      "pluginVersion": "9.3.0",
       "targets": [
         {
           "database": "\"$Database\"",
