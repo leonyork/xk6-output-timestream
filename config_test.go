@@ -3,7 +3,6 @@ package timestream
 import (
 	"os"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -26,15 +25,6 @@ func TestNewConfig(t *testing.T) {
 		t.Parallel()
 		assert.Equal(t, "", config.TableName)
 	})
-
-	t.Run("The PushInterval is 1s", func(t *testing.T) {
-		t.Parallel()
-		assert.Equal(
-			t,
-			time.Duration(1)*time.Second,
-			time.Duration(config.PushInterval.Duration),
-		)
-	})
 }
 
 func TestGetConsolidatedConfig(t *testing.T) {
@@ -46,11 +36,6 @@ func TestGetConsolidatedConfig(t *testing.T) {
 		assert.Equal(t, "", config.Region)
 		assert.Equal(t, "", config.DatabaseName)
 		assert.Equal(t, "", config.TableName)
-		assert.Equal(
-			t,
-			time.Duration(1)*time.Second,
-			time.Duration(config.PushInterval.Duration),
-		)
 	})
 
 	testJson := []byte(
@@ -63,11 +48,6 @@ func TestGetConsolidatedConfig(t *testing.T) {
 		assert.Equal(t, "us-east-1", config.Region)
 		assert.Equal(t, "testDbJson", config.DatabaseName)
 		assert.Equal(t, "testTableJson", config.TableName)
-		assert.Equal(
-			t,
-			time.Duration(30)*time.Second,
-			time.Duration(config.PushInterval.Duration),
-		)
 	})
 
 	os.Setenv("K6_TIMESTREAM_REGION", "eu-west-1")
@@ -81,11 +61,6 @@ func TestGetConsolidatedConfig(t *testing.T) {
 		assert.Equal(t, "eu-west-1", config.Region)
 		assert.Equal(t, "testDbEnv", config.DatabaseName)
 		assert.Equal(t, "testTableEnv", config.TableName)
-		assert.Equal(
-			t,
-			time.Duration(1)*time.Hour,
-			time.Duration(config.PushInterval.Duration),
-		)
 	})
 
 	t.Run(
@@ -96,11 +71,6 @@ func TestGetConsolidatedConfig(t *testing.T) {
 			assert.Equal(t, "eu-west-1", config.Region)
 			assert.Equal(t, "testDbEnv", config.DatabaseName)
 			assert.Equal(t, "testTableEnv", config.TableName)
-			assert.Equal(
-				t,
-				time.Duration(1)*time.Hour,
-				time.Duration(config.PushInterval.Duration),
-			)
 		},
 	)
 }

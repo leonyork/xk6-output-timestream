@@ -30,12 +30,13 @@ endif
 TEST_IMAGE_NAME:=$(IMAGE_NAME)_test
 DOCKER_AWS_ARGS:=-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION -e AWS_REGION -e AWS_ROLE_ARN -e AWS_ROLE_SESSION_NAME -e AWS_SESSION_TOKEN
 DOCKER_K6_ARGS:=-e K6_TIMESTREAM_REGION -e K6_TIMESTREAM_DATABASE_NAME -e K6_TIMESTREAM_TABLE_NAME -e K6_VUS -e K6_ITERATIONS
+export TEST_ID=$(shell date +%s)
 .PHONY: test-integration
 test-integration:
 	docker build -t $(TEST_IMAGE_NAME) --build-arg K6_IMAGE=$(FULL_IMAGE_NAME) --quiet --file test/test.Dockerfile $(CURDIR)/test
-	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -v "$(AWS_CONFIG_FILE)":"/home/k6/.aws" $(TEST_IMAGE_NAME)
+	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -e TEST_ID="$(TEST_ID)" -v "$(AWS_CONFIG_FILE)":"/home/k6/.aws" $(TEST_IMAGE_NAME)
 	docker build -t $(TEST_IMAGE_NAME) --quiet $(CURDIR)/test
-	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -v "$(AWS_CONFIG_FILE)":"/root/.aws" $(TEST_IMAGE_NAME)
+	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -e TEST_ID="$(TEST_ID)" -v "$(AWS_CONFIG_FILE)":"/root/.aws" $(TEST_IMAGE_NAME)
 
 INFRA_STACK_NAME?=dev-xk6-output-timestream-test
 INFRA_STACK_PARAMETERS="DatabaseName"="$(K6_TIMESTREAM_DATABASE_NAME)" \

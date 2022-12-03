@@ -66,6 +66,25 @@ If you don't want to use dev containers, you'll need to make sure you install th
 
 There are targets for different development tasks in [the Makefile](Makefile).
 
+### Architecture
+
+Metric samples are passed from each of the K6 VUs to `metricSamplesHandler`. This converts them to the format that the Timestream SDK expects and holds on to them until it has 100 records to save ([the max batch size for Timestream](https://docs.aws.amazon.com/timestream/latest/developerguide/API_WriteRecords.html)). It will then save these asyncronously by kicking off a new go-routine to perform the save.
+
+The channel for receiving metric samples is closed at the end of the test and the left-over records are saved.
+
+```mermaid
+  graph TD;
+
+    K6-VU1.AddMetricSamples--metric samples-->metricSamplesHandler
+    K6-VU2.AddMetricSamples--metric samples-->metricSamplesHandler
+    K6-VUN.AddMetricSamples--metric samples-->metricSamplesHandler
+
+    metricSamplesHandler--have 100 samples?-->writeRecordsAsync
+    metricSamplesHandler--shutting down?-->writeRecordsAsync
+
+    writeRecordsAsync--new go routine-->writeRecords
+```
+
 ### Testing
 
 #### Integration

@@ -177,14 +177,18 @@ func TestFlushMetricsBatching(t *testing.T) {
 				client: &TimestreamWriteClientMock{
 					mockWriteRecords: func(ctx context.Context, params *timestreamwrite.WriteRecordsInput, optFns ...func(*timestreamwrite.Options)) (*timestreamwrite.WriteRecordsOutput, error) {
 						queue <- params
-						return nil, nil
+						return &timestreamwrite.WriteRecordsOutput{
+							RecordsIngested: &types.RecordsIngested{
+								Total: int32(len(params.Records)),
+							},
+						}, nil
 					},
 				},
 			}
 
+			output.Start()
 			output.AddMetricSamples(sampleContainers)
-
-			output.flushMetrics()
+			output.Stop()
 
 			close(queue)
 			var actualWriteRecords = make([]timestreamwrite.WriteRecordsInput, actualNumberOfWriteRecords)

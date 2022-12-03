@@ -68,7 +68,7 @@ func TestFixtures(t *testing.T) {
 					strings.Replace(
 						query,
 						"$__filter",
-						"test_type = 'integration-test'",
+						fmt.Sprintf("test_type = '%s'", os.Getenv("TEST_ID")),
 						-1,
 					),
 					"$__database",

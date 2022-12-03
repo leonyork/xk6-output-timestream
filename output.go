@@ -40,13 +40,12 @@ type TimestreamWriteClient interface {
 }
 
 type Output struct {
-	output.SampleBuffer
+	client TimestreamWriteClient
+	config *Config
+	logger logrus.FieldLogger
 
-	periodicFlusher *output.PeriodicFlusher
-	params          output.Params
-	client          TimestreamWriteClient
-	config          *Config
-	logger          logrus.FieldLogger
+	metricSampleContainerQueue chan *metrics.SampleContainer
+	doneWriting                chan bool
 }
 
 func New(params output.Params) (output.Output, error) {
@@ -66,7 +65,6 @@ func New(params output.Params) (output.Output, error) {
 	client := timestreamwrite.NewFromConfig(awsConfig)
 
 	return &Output{
-		params: params,
 		client: client,
 		config: &extensionConfig,
 		logger: params.Logger.WithField("component", "timestream"),
@@ -83,57 +81,61 @@ func (o *Output) Description() string {
 
 func (o *Output) Start() error {
 	o.logger.Debug("Starting...")
-
-	pf, err := output.NewPeriodicFlusher(
-		o.config.PushInterval.TimeDuration(),
-		o.flushMetrics,
-	)
-	if err != nil {
-		return err
-	}
+	o.metricSampleContainerQueue = make(chan *metrics.SampleContainer)
+	o.doneWriting = make(chan bool)
+	go o.metricSamplesHandler()
 	o.logger.Debug("Started!")
-	o.periodicFlusher = pf
-
 	return nil
 }
 
 func (o *Output) Stop() error {
 	o.logger.Debug("Stopping...")
-	o.periodicFlusher.Stop()
+	close(o.metricSampleContainerQueue)
+	o.logger.Debug("Closed MetricSampleContainerQueue")
+	<-o.doneWriting
 	o.logger.Debug("Stopped!")
 	return nil
 }
 
+func (o *Output) AddMetricSamples(samples []metrics.SampleContainer) {
+	for _, sampleContainer := range samples {
+		sampleContainer := sampleContainer
+		o.metricSampleContainerQueue <- &sampleContainer
+	}
+}
+
 /**
- * Controls the writing of metrics to the database
+ * Pulls together all the metrics in one place in the correct format for timestream
+ * so that it can write the metrics when it reaches the TIMESTREAM_MAX_BATCH_SIZE
  */
-func (o *Output) flushMetrics() {
+func (o *Output) metricSamplesHandler() {
 	// See https://docs.aws.amazon.com/timestream/latest/developerguide/API_WriteRecords.html
 	TIMESTREAM_MAX_BATCH_SIZE := 100
-	samples := o.GetBufferedSamples()
-	start := time.Now()
+	var timestreamRecordsToSave []types.Record
 	var wg sync.WaitGroup
-	var allRecords []types.Record
-	for _, sc := range samples {
-		samples := sc.GetSamples()
-		o.logger.
-			WithField("samples", len(samples)).
-			Debug("Creating records for samples")
+	start := time.Now()
+	totalWritten := 0
+	for metricSampleContainer := range o.metricSampleContainerQueue {
+		timestreamRecordsForContainer := o.createRecords((*metricSampleContainer).GetSamples())
+		timestreamRecordsToSave = append(timestreamRecordsToSave, timestreamRecordsForContainer...)
 
-		records := o.createRecords(samples)
-		allRecords = append(allRecords, records...)
-
-		if len(allRecords) > TIMESTREAM_MAX_BATCH_SIZE {
-			o.writeRecordsAsync(allRecords[:TIMESTREAM_MAX_BATCH_SIZE], &wg, &start)
-			allRecords = allRecords[TIMESTREAM_MAX_BATCH_SIZE:]
+		if len(timestreamRecordsToSave) > TIMESTREAM_MAX_BATCH_SIZE {
+			o.writeRecordsAsync(timestreamRecordsToSave[:TIMESTREAM_MAX_BATCH_SIZE], &wg, &start)
+			timestreamRecordsToSave = timestreamRecordsToSave[TIMESTREAM_MAX_BATCH_SIZE:]
+			totalWritten += TIMESTREAM_MAX_BATCH_SIZE
 		}
 	}
 
-	if len(allRecords) > 0 {
-		o.writeRecordsAsync(allRecords, &wg, &start)
+	if len(timestreamRecordsToSave) > 0 {
+		o.writeRecordsAsync(timestreamRecordsToSave, &wg, &start)
+		totalWritten += len(timestreamRecordsToSave)
 	}
 
+	o.logger.Debugf("Wrote %d records to timestream", totalWritten)
+
 	wg.Wait()
+	o.logger.Debug("Metric samples handler done")
+	o.doneWriting <- true
 }
 
 /**
@@ -186,32 +188,45 @@ func (o *Output) writeRecordsAsync(
 	waitGroup.Add(1)
 	go func(recordsToSave *[]types.Record) {
 		defer waitGroup.Done()
-		o.logger.WithField("t", time.Since(*startTime)).
-			WithField("count", len(*recordsToSave)).
-			Debug("Starting write to timestream")
 
-		err := o.writeRecords(*recordsToSave)
+		logger := o.logger.
+			WithField("count", len(*recordsToSave)).
+			WithField("records_address", &recordsToSave)
+
+		logger.WithField("t", time.Since(*startTime)).
+			Debug("Starting write")
+
+		startWriteTime := time.Now()
+		countSaved, err := o.writeRecords(recordsToSave)
 
 		if err != nil {
-			o.logger.WithError(err).
-				WithField("count", len(*recordsToSave)).
-				Error("Timestream: failed to write")
+			logger.
+				WithField("t", time.Since(*startTime)).
+				WithField("duration", time.Since(startWriteTime)).
+				WithError(err).
+				Error("Failed to write")
 			return
 		}
-		o.logger.WithField("t", time.Since(*startTime)).
-			WithField("count", len(*recordsToSave)).
-			Debug("Wrote metrics to timestream")
+		logger.
+			WithField("t", time.Since(*startTime)).
+			WithField("duration", time.Since(startWriteTime)).
+			WithField("count_saved", countSaved).
+			Debug("Wrote metrics")
 	}(&records)
 }
 
-func (o *Output) writeRecords(records []types.Record) error {
+func (o *Output) writeRecords(records *[]types.Record) (int32, error) {
 	writeRecordsInput := &timestreamwrite.WriteRecordsInput{
 		DatabaseName: aws.String(o.config.DatabaseName),
 		TableName:    aws.String(o.config.TableName),
-		Records:      records,
+		Records:      *records,
 	}
 
-	_, err := o.client.WriteRecords(context.TODO(), writeRecordsInput)
+	response, err := o.client.WriteRecords(context.TODO(), writeRecordsInput)
 
-	return err
+	if err != nil {
+		return 0, err
+	}
+
+	return response.RecordsIngested.Total, nil
 }
