@@ -2,24 +2,18 @@ package timestream
 
 import (
 	"encoding/json"
-	"time"
 
 	"github.com/kelseyhightower/envconfig"
-	"go.k6.io/k6/lib/types"
 )
 
 type Config struct {
 	Region       string `json:"region"       envconfig:"K6_TIMESTREAM_REGION"`
 	DatabaseName string `json:"databaseName" envconfig:"K6_TIMESTREAM_DATABASE_NAME"`
 	TableName    string `json:"tableName"    envconfig:"K6_TIMESTREAM_TABLE_NAME"`
-
-	PushInterval types.NullDuration `json:"pushInterval,omitempty" envconfig:"K6_TIMESTREAM_PUSH_INTERVAL"`
 }
 
 func NewConfig() Config {
-	c := Config{
-		PushInterval: types.NewNullDuration(1*time.Second, false),
-	}
+	c := Config{}
 	return c
 }
 
@@ -32,9 +26,6 @@ func (c Config) apply(cfg Config) Config {
 	}
 	if len(cfg.TableName) > 0 {
 		c.TableName = cfg.TableName
-	}
-	if cfg.PushInterval.Valid {
-		c.PushInterval = cfg.PushInterval
 	}
 	return c
 }
