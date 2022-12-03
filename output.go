@@ -114,7 +114,6 @@ func (o *Output) metricSamplesHandler() {
 	var timestreamRecordsToSave []types.Record
 	var wg sync.WaitGroup
 	start := time.Now()
-	totalWritten := 0
 	for metricSampleContainer := range o.metricSampleContainerQueue {
 		timestreamRecordsForContainer := o.createRecords((*metricSampleContainer).GetSamples())
 		timestreamRecordsToSave = append(timestreamRecordsToSave, timestreamRecordsForContainer...)
@@ -122,16 +121,12 @@ func (o *Output) metricSamplesHandler() {
 		if len(timestreamRecordsToSave) > TIMESTREAM_MAX_BATCH_SIZE {
 			o.writeRecordsAsync(timestreamRecordsToSave[:TIMESTREAM_MAX_BATCH_SIZE], &wg, &start)
 			timestreamRecordsToSave = timestreamRecordsToSave[TIMESTREAM_MAX_BATCH_SIZE:]
-			totalWritten += TIMESTREAM_MAX_BATCH_SIZE
 		}
 	}
 
 	if len(timestreamRecordsToSave) > 0 {
 		o.writeRecordsAsync(timestreamRecordsToSave, &wg, &start)
-		totalWritten += len(timestreamRecordsToSave)
 	}
-
-	o.logger.Debugf("Wrote %d records to timestream", totalWritten)
 
 	wg.Wait()
 	o.logger.Debug("Metric samples handler done")
