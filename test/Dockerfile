@@ -1,4 +1,4 @@
-FROM golang:1.19.3-buster
+FROM golang:1.19.4-buster
 
 WORKDIR /app
 COPY go.mod go.sum ./
