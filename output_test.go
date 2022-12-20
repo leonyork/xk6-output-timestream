@@ -154,10 +154,11 @@ func TestFlushMetricsBatching(t *testing.T) {
 				samples := make([]metrics.Sample, testSampleContainer.sampleCount)
 				for j := range samples {
 					samples[j] = metrics.Sample{
-						Metric: r.MustNewMetric("test_metric", metrics.Counter),
-						Tags: metrics.IntoSampleTags(
-							&map[string]string{"key": "val"},
-						),
+						TimeSeries: metrics.TimeSeries{
+							Metric: r.MustNewMetric("test_metric", metrics.Counter),
+							Tags: r.RootTagSet().
+								With("key", "val"),
+						},
 						Time:  time.UnixMicro(int64(j)),
 						Value: float64(i * j),
 					}
@@ -226,18 +227,22 @@ func TestCreateRecords(t *testing.T) {
 	r := metrics.NewRegistry()
 	samples := []metrics.Sample{
 		{
-			Metric: r.MustNewMetric("test_metric1", metrics.Counter),
-			Tags: metrics.IntoSampleTags(
-				&map[string]string{"key1.1": "val1.1", "key2.1": "val2.1"},
-			),
+			TimeSeries: metrics.TimeSeries{
+				Metric: r.MustNewMetric("test_metric1", metrics.Counter),
+				Tags: r.RootTagSet().
+					With("key1.1", "val1.1").
+					With("key2.1", "val2.1"),
+			},
 			Time:  time.UnixMicro(int64(0)),
 			Value: float64(1),
 		},
 		{
-			Metric: r.MustNewMetric("test_metric2", metrics.Counter),
-			Tags: metrics.IntoSampleTags(
-				&map[string]string{"Empty String": "", "key2.2": "val2.2"},
-			),
+			TimeSeries: metrics.TimeSeries{
+				Metric: r.MustNewMetric("test_metric2", metrics.Counter),
+				Tags: r.RootTagSet().
+					With("Empty String", "").
+					With("key2.2", "val2.2"),
+			},
 			Time:  time.UnixMicro(int64(1)),
 			Value: float64(2.2),
 		},
