@@ -235,6 +235,10 @@ func TestCreateRecords(t *testing.T) {
 			},
 			Time:  time.UnixMicro(int64(0)),
 			Value: float64(1),
+			Metadata: map[string]string{
+				"md1.1": "mdval1.1",
+				"md2.1": "mdval2.1",
+			},
 		},
 		{
 			TimeSeries: metrics.TimeSeries{
@@ -245,6 +249,10 @@ func TestCreateRecords(t *testing.T) {
 			},
 			Time:  time.UnixMicro(int64(1)),
 			Value: float64(2.2),
+			Metadata: map[string]string{
+				"empty": "",
+				"md2.2": "mdval2.2",
+			},
 		},
 	}
 
@@ -259,6 +267,14 @@ func TestCreateRecords(t *testing.T) {
 					Name:  aws.String("key2.1"),
 					Value: aws.String("val2.1"),
 				},
+				{
+					Name:  aws.String("md1.1"),
+					Value: aws.String("mdval1.1"),
+				},
+				{
+					Name:  aws.String("md2.1"),
+					Value: aws.String("mdval2.1"),
+				},
 			},
 			MeasureName:      aws.String("test_metric1"),
 			MeasureValue:     aws.String("1.000000"),
@@ -271,6 +287,10 @@ func TestCreateRecords(t *testing.T) {
 				{
 					Name:  aws.String("key2.2"),
 					Value: aws.String("val2.2"),
+				},
+				{
+					Name:  aws.String("md2.2"),
+					Value: aws.String("mdval2.2"),
 				},
 			},
 			MeasureName:      aws.String("test_metric2"),

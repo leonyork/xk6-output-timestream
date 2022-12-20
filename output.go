@@ -152,6 +152,17 @@ func (o *Output) createRecords(samples []metrics.Sample) []types.Record {
 			})
 		}
 
+		for tagKey, tagValue := range sample.Metadata {
+			if len(strings.TrimSpace(tagValue)) == 0 {
+				continue
+			}
+
+			dimensions = append(dimensions, types.Dimension{
+				Name:  aws.String(tagKey),
+				Value: aws.String(tagValue),
+			})
+		}
+
 		records = append(records, types.Record{
 			Dimensions:       dimensions,
 			MeasureName:      aws.String(sample.Metric.Name),
