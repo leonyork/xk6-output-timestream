@@ -1,5 +1,5 @@
 IMAGE_NAME=grafana-oss
-GRAFANA_VERSION:=9.3.2
+GRAFANA_VERSION:=9.3.6
 FULL_IMAGE_NAME=$(IMAGE_NAME):$(GRAFANA_VERSION)
 
 VERSION=$(shell git tag -l --contains HEAD | grep '^v')
