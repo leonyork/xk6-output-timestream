@@ -3,7 +3,7 @@ ARG K6_VERSION=0.42.0
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.19.5-buster AS builder
+FROM golang:1.20.0-buster AS builder
 
 RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
 
