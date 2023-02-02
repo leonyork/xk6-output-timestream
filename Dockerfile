@@ -3,7 +3,7 @@ ARG K6_VERSION=0.42.0
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.19.5-buster AS builder
+FROM golang:1.20.0-bullseye AS builder
 
 RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
 
@@ -21,8 +21,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 # Docker CLI for integration tests
 RUN apt-get update \ 
   && apt-get install -y \
-  gnupg=2.2.12-1+deb10u2 \
-  lsb-release=10.2019051400 \
+  gnupg=2.2.27-2+deb11u2 \
+  lsb-release=11.1.0 \
   --no-install-recommends \
   && mkdir -p /etc/apt/keyrings \
   && curl -fsSL https://download.docker.com/linux/debian/gpg | \
@@ -35,14 +35,14 @@ RUN apt-get update \
   tee /etc/apt/sources.list.d/docker.list >/dev/null \
   && apt-get update \
   && apt-get install -y \
-  docker-ce-cli=5:18.09.0~3-0~debian-buster \
+  docker-ce-cli=5:20.10.23~3-0~debian-bullseye \
   --no-install-recommends \
   && apt-get clean
 
 # AWS CLI for integration tests
 RUN apt-get update \ 
   && apt-get install -y \
-  unzip=6.0-23+deb10u3 \
+  unzip=6.0-26+deb11u1 \
   --no-install-recommends \
   && apt-get clean \
   && curl -fsSL \
@@ -61,8 +61,8 @@ RUN curl -fsSL \
 
 # shfmt for formatting shell scripts
 # & golines for formatting go files
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.5.1 \
-  && go install github.com/segmentio/golines@v0.9.0
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.6.0 \
+  && go install github.com/segmentio/golines@v0.11.0
 
 # Node for prettier
 # hadolint ignore=DL3009
@@ -70,17 +70,17 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x \
   | bash - \
   && apt-get update \
   && apt-get install -y \
-  less=487-0.1+b1 \
-  nodejs=18.12.1-deb-1nodesource1 \
+  less=551-2 \
+  nodejs=18.13.0-deb-1nodesource1 \
   --no-install-recommends \
   && apt-get clean
 
 # Prettier for formatting
-RUN npm install --global prettier@2.7.1
+RUN npm install --global prettier@2.8.3
 
 # uplift for creating versions from conventional commits
 RUN curl -fsSL https://raw.githubusercontent.com/gembaadvantage/uplift/main/scripts/install \
-  | bash -s -- -v v2.18.1 --no-sudo
+  | bash -s -- -v v2.21.0 --no-sudo
 
 
 #################################################
