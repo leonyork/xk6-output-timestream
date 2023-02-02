@@ -19,8 +19,8 @@ apt-get install -y \
 # Useful tools
 apt-get update
 apt-get install -y \
-	python \
-	python-pip \
+	python3 \
+	python3-pip \
 	zsh
 
 pip install --no-cache-dir \
