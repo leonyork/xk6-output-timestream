@@ -180,7 +180,7 @@ release-go:
 
 .PHONY: changelog
 changelog:
-	uplift changelog --no-stage --no-push
+	uplift changelog --no-stage --no-push --ignore-detached
 
 .PHONY: release-github
 release-github:
