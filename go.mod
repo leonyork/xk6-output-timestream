@@ -3,7 +3,7 @@ module github.com/leonyork/xk6-output-timestream
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.17.3
+	github.com/aws/aws-sdk-go-v2 v1.17.4
 	github.com/aws/aws-sdk-go-v2/config v1.18.11
 	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.0
 	github.com/kelseyhightower/envconfig v1.4.0
