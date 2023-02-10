@@ -71,7 +71,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x \
   && apt-get update \
   && apt-get install -y \
   less=551-2 \
-  nodejs=18.13.0-deb-1nodesource1 \
+  nodejs=18.14.0-deb-1nodesource1 \
   --no-install-recommends \
   && apt-get clean
 
