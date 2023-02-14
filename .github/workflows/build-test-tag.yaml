@@ -1,6 +1,6 @@
-name: Build on PR (main)
+name: Build, test and tag for release
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths-ignore:
@@ -51,3 +51,16 @@ jobs:
     needs:
       - prepare
       - build
+
+  release:
+    uses: ./.github/workflows/_release.yaml
+    with:
+      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
+    secrets:
+      SSH_KEY_GITHUB: ${{ secrets.SSH_KEY_GITHUB }}
+    needs:
+      - prepare
+      - build
+      - validate
+      - integration
+      - integration-cross-region

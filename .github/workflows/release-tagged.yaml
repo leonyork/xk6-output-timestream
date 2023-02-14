@@ -1,6 +1,6 @@
 # Note that get this to run you need to follow the instructions
 # in https://github.com/orgs/community/discussions/27028#discussioncomment-3254367
-name: Build on Push (version tag)
+name: Release tagged version
 on:
   push:
     tags:
