@@ -3,7 +3,7 @@ ARG K6_VERSION=0.42.0
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.20.0-bullseye AS builder
+FROM golang:1.20.1-bullseye AS builder
 
 RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
 
