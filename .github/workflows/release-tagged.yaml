@@ -44,7 +44,7 @@ jobs:
       - name: Download k6 executable (x86_64)
         uses: dawidd6/action-download-artifact@v2
         with:
-          workflow: push-main.yaml
+          workflow: build-test-tag.yaml
           workflow_conclusion: success
           commit: ${{github.sha}}
           name: k6
