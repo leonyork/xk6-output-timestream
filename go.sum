@@ -109,6 +109,8 @@ github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.21 h1:UYhc
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.21/go.mod h1:NXJls8x8f9zVSaf+EKKoonqaahWK69MUWm6w6ob0FHs=
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.22 h1:6zEryIiJOSk5/OcVHzkPDwzNBQ2atYCTShyA7TqkuxA=
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.22/go.mod h1:moeOz5SKfY0p6pNIChdPIQdfaUfWI67+OVe0/r6+aGY=
+github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.23 h1:5AwQnYQT3ZX/N7hPTAx4ClWyucaiqr2esQRMNbJIby0=
+github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.23/go.mod h1:s8OUYECPoPpevQHmRmMBemFIx6Oc91iapsw56KiXIMY=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.19 h1:GE25AWCdNUPh9AOJzI9KIJnja7IwUc1WyUqz/JTyJ/I=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.19/go.mod h1:02CP6iuYP+IVnBX5HULVdSAku/85eHB2Y9EsFhrkEwU=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.20 h1:jlgyHbkZQAgAc7VIxJDmtouH8eNjOk2REVAQfVhdaiQ=
@@ -183,6 +185,8 @@ github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.1 h1:FkMBSbcINnsHQsNA
 github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.1/go.mod h1:rnAwwZQneX/pLDfZt6/xpGLEWbzy8bP+DhiQhuwvSgM=
 github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.2 h1:pC8ws9gqixW33FgTVdIplLs46jH3/td7sZ0mIF6R6uw=
 github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.2/go.mod h1:rnAwwZQneX/pLDfZt6/xpGLEWbzy8bP+DhiQhuwvSgM=
+github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.3 h1:j8zOPZTBZ4/tn/CKqEgg8JNt2uRfEdWflCt2pfHR4jU=
+github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.15.3/go.mod h1:d/oxd3ap2hu2jFVz59gwWVK/tKo7cwTFaBQE0+r/M3A=
 github.com/aws/smithy-go v1.13.4 h1:/RN2z1txIJWeXeOkzX+Hk/4Uuvv7dWtCjbmVJcrskyk=
 github.com/aws/smithy-go v1.13.4/go.mod h1:Tg+OJXh4MB2R/uN61Ko2f6hTZwB/ZYGOtib8J3gBHzA=
 github.com/aws/smithy-go v1.13.5 h1:hgz0X/DX0dGqTYpGALqXJoRKRj5oQ7150i5FdTePzO8=
