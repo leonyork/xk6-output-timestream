@@ -1,4 +1,4 @@
-ARG K6_VERSION=0.42.0
+ARG K6_VERSION=0.43.0
 
 #################################################
 # Basic environment for building the app
