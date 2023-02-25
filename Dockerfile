@@ -6,6 +6,7 @@ ARG K6_VERSION=0.43.0
 #################################################
 FROM golang:1.20.1-bullseye AS builder
 
+# renovate: datasource=go
 RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
 
 
