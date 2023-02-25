@@ -96,6 +96,9 @@ prettier-check:
 .PHONY: hadolint-check
 hadolint-check:
 	@hadolint Dockerfile
+	@hadolint test/Dockerfile
+	@hadolint test/test.Dockerfile
+	@hadolint grafana/Dockerfile
 	@echo Hadolint Passed
 
 # Formatting with shfmt (shell scripts)
