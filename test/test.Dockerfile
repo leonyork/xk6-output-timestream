@@ -1,6 +1,8 @@
 ARG K6_IMAGE=k6
+# hadolint ignore=DL3006
 FROM $K6_IMAGE
 
+WORKDIR /app
 ARG TEST_FILE=test.js
 COPY $TEST_FILE .
 
