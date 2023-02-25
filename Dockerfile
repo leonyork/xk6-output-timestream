@@ -1,3 +1,4 @@
+# renovate: datasource=docker depName=loadimpact/k6 versioning=docker
 ARG K6_VERSION=0.43.0
 
 #################################################
@@ -71,7 +72,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x \
   && apt-get update \
   && apt-get install -y \
   less=551-2 \
-  nodejs=18.14.0-deb-1nodesource1 \
+  nodejs=18.14.2-deb-1nodesource1 \
   --no-install-recommends \
   && apt-get clean
 
