@@ -6,8 +6,10 @@ ARG K6_VERSION=0.43.0
 #################################################
 FROM golang:1.20.1-bullseye AS builder
 
-RUN go install go.k6.io/xk6/cmd/xk6@v0.8.1
-
+# renovate: datasource=go depName=go.k6.io/xk6
+ARG XK6_VERSION=v0.8.1
+ENV XK6_VERSION=${XK6_VERSION}
+RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
 #################################################
 # Used for development and CI. Any development
@@ -20,10 +22,23 @@ FROM builder AS ci
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Docker CLI for integration tests
+
+# renovate: datasource=repology depName=debian_11/gnupg versioning=loose
+ARG GNUPG_VERSION=2.2.27
+ENV GNUPG_VERSION=${GNUPG_VERSION}
+
+# renovate: datasource=repology depName=debian_11/lsb versioning=loose
+ARG LSB_VERSION=11.1.0
+ENV LSB_VERSION=${LSB_VERSION}
+
+# renovate: datasource=docker depName=docker versioning=docker
+ARG DOCKER_VERSION=20.10.23
+ENV DOCKER_VERSION=${DOCKER_VERSION}
+
 RUN apt-get update \ 
   && apt-get install -y \
-  gnupg=2.2.27-2+deb11u2 \
-  lsb-release=11.1.0 \
+  gnupg=${GNUPG_VERSION}* \
+  lsb-release=${LSB_VERSION} \
   --no-install-recommends \
   && mkdir -p /etc/apt/keyrings \
   && curl -fsSL https://download.docker.com/linux/debian/gpg | \
@@ -36,14 +51,19 @@ RUN apt-get update \
   tee /etc/apt/sources.list.d/docker.list >/dev/null \
   && apt-get update \
   && apt-get install -y \
-  docker-ce-cli=5:20.10.23~3-0~debian-bullseye \
+  docker-ce-cli=5:${DOCKER_VERSION}* \
   --no-install-recommends \
   && apt-get clean
 
 # AWS CLI for integration tests
+
+# renovate: datasource=repology depName=debian_11/unzip versioning=loose
+ARG UNZIP_VERSION=6.0
+ENV UNZIP_VERSION=${UNZIP_VERSION}
+
 RUN apt-get update \ 
   && apt-get install -y \
-  unzip=6.0-26+deb11u1 \
+  unzip=${UNZIP_VERSION}* \
   --no-install-recommends \
   && apt-get clean \
   && curl -fsSL \
@@ -55,34 +75,62 @@ RUN apt-get update \
   && rm -rf ./aws
 
 # Hadolint for linting Dockerfile
+
+# renovate: datasource=github-releases depName=hadolint/hadolint
+ARG HADOLINT_VERSION=v2.12.0
+ENV HADOLINT_VERSION=${HADOLINT_VERSION}
+
 RUN curl -fsSL \
-  https://github.com/hadolint/hadolint/releases/download/v2.12.0/hadolint-Linux-x86_64 \
+  "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
   -o /usr/local/bin/hadolint \
   && chmod +x /usr/local/bin/hadolint
 
 # shfmt for formatting shell scripts
 # & golines for formatting go files
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@v3.6.0 \
-  && go install github.com/segmentio/golines@v0.11.0
+
+# renovate: datasource=go depName=mvdan.cc/sh/v3
+ARG SHFMT_VERSION=v3.6.0
+ENV SHFMT_VERSION=${SHFMT_VERSION}
+
+# renovate: datasource=go depName=github.com/segmentio/golines
+ARG GOLINES_VERSION=v0.11.0
+ENV GOLINES_VERSION=${GOLINES_VERSION}
+
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION} \
+  && go install github.com/segmentio/golines@${GOLINES_VERSION}
 
 # Node for prettier
+
+# renovate: datasource=repology depName=debian_11/less versioning=loose
+ARG LESS_VERSION=551
+ENV LESS_VERSION=${LESS_VERSION}
+
+# renovate: datasource=github-releases depName=nodejs/node
+ARG NODE_VERSION=19.7.0
+ENV NODE_VERSION=${NODE_VERSION}
+
 # hadolint ignore=DL3009
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x \
+RUN curl -fsSL https://deb.nodesource.com/setup_19.x \
   | bash - \
   && apt-get update \
   && apt-get install -y \
-  less=551-2 \
-  nodejs=18.14.2-deb-1nodesource1 \
+  less=${LESS_VERSION}* \
+  nodejs=${NODE_VERSION}* \
   --no-install-recommends \
   && apt-get clean
 
 # Prettier for formatting
-RUN npm install --global prettier@2.8.3
+# renovate: datasource=npm depName=prettier
+ARG PRETTIER_VERSION=2.8.4
+ENV PRETTIER_VERSION=${PRETTIER_VERSION}
+RUN npm install --global prettier@${PRETTIER_VERSION}
 
 # uplift for creating versions from conventional commits
+# renovate: datasource=github-releases depName=gembaadvantage/uplift
+ARG UPLIFT_VERSION=v2.21.0
+ENV UPLIFT_VERSION=${UPLIFT_VERSION}
 RUN curl -fsSL https://raw.githubusercontent.com/gembaadvantage/uplift/main/scripts/install \
-  | bash -s -- -v v2.21.0 --no-sudo
-
+  | bash -s -- -v ${UPLIFT_VERSION} --no-sudo
 
 #################################################
 # Build k6 with the extension
