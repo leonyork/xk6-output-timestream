@@ -32,7 +32,7 @@ ARG LSB_VERSION=11.1.0
 ENV LSB_VERSION=${LSB_VERSION}
 
 # renovate: datasource=docker depName=docker versioning=docker
-ARG DOCKER_VERSION=20.10.23
+ARG DOCKER_VERSION=23.0.1
 ENV DOCKER_VERSION=${DOCKER_VERSION}
 
 RUN apt-get update \ 
