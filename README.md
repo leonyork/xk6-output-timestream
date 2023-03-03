@@ -96,6 +96,7 @@ The integration tests work by creating a Timestream database and table, running 
     Client--deploy-->Timestream;
     Client--build-->k6;
     Client--run-->k6;
+    k6-->nginx-fake-api
     k6--write-->Timestream;
     Client--build-->Tests;
     Client--run-->Tests;

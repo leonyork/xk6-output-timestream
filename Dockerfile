@@ -132,6 +132,28 @@ ENV UPLIFT_VERSION=${UPLIFT_VERSION}
 RUN curl -fsSL https://raw.githubusercontent.com/gembaadvantage/uplift/main/scripts/install \
   | bash -s -- -v ${UPLIFT_VERSION} --no-sudo
 
+# docker-compose for running integration tests
+# renovate: datasource=pypi depName=docker-compose
+ARG DOCKER_COMPOSE_VERSION=1.29.2
+ENV DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION}
+
+
+# renovate: datasource=repology depName=python3 versioning=loose
+ARG PYTHON_VERSION=3.9.2
+ENV PYTHON_VERSION=${PYTHON_VERSION}
+
+# renovate: datasource=repology depName=python3 versioning=loose
+ARG PIP_VERSION=20.3.4
+ENV PIP_VERSION=${PIP_VERSION}
+
+RUN apt-get update \ 
+  && apt-get install -y \
+  python3=${PYTHON_VERSION}* \
+  python3-pip=${PIP_VERSION}* \
+  --no-install-recommends \
+  && apt-get clean \
+  && pip install --no-cache-dir docker-compose==${DOCKER_COMPOSE_VERSION}
+
 #################################################
 # Build k6 with the extension
 #################################################

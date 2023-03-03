@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  test:
+    build:
+      context: .
+      dockerfile: test.Dockerfile
+      args:
+        - K6_IMAGE
+    environment:
+      - TARGET_URL=http://nginx
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_DEFAULT_REGION
+      - AWS_REGION
+      - AWS_ROLE_ARN
+      - AWS_ROLE_SESSION_NAME
+      - AWS_SESSION_TOKEN
+      - K6_TIMESTREAM_REGION
+      - K6_TIMESTREAM_DATABASE_NAME
+      - K6_TIMESTREAM_TABLE_NAME
+      - K6_VUS
+      - K6_ITERATIONS
+      - TEST_ID
+  nginx:
+    image: "nginx:1.23.3-alpine"
