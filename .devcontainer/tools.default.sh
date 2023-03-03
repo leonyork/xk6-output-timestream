@@ -12,16 +12,13 @@ set -eux
 apt-get update
 apt-get install -y \
 	ca-certificates \
-	curl \
-	gnupg \
-	lsb-release
+	curl
 
 # Useful tools
 apt-get update
-apt-get install -y \
-	python3 \
-	python3-pip \
-	zsh
+apt-get install -y zsh
+
+chmod -R +x .git/hooks
 
 pip install --no-cache-dir \
 	pre-commit
