@@ -16,51 +16,53 @@
     "HOST_AWS_CONFIG_FILE": "${localEnv:HOME}${localEnv:USERPROFILE}/.aws"
   },
 
-  // Set *default* container specific settings.json values on container create.
-  "settings": {
-    "go.testOnSave": true,
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true,
-      "source.organizeImports": true
-    },
-    "[go]": {
-      "editor.defaultFormatter": "golang.go"
-    },
-    "[json]": {
-      "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[shellscript]": {
-      "editor.defaultFormatter": "foxundermoon.shell-format"
-    },
-    "[dockerfile]": {
-      "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-    },
-    "[ignore]": {
-      "editor.defaultFormatter": "foxundermoon.shell-format"
-    },
-    "[markdown]": {
-      "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    },
-    "shellformat.path": "/go/bin/shfmt",
-    "editor.formatOnSave": true,
-    "terminal.integrated.defaultProfile.linux": "zsh",
-    "terminal.integrated.profiles.linux": {
-      "zsh": {
-        "path": "/bin/zsh"
-      }
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "go.testOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+        },
+        "[go]": {
+          "editor.defaultFormatter": "golang.go"
+        },
+        "[json]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[shellscript]": {
+          "editor.defaultFormatter": "foxundermoon.shell-format"
+        },
+        "[dockerfile]": {
+          "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+        },
+        "[ignore]": {
+          "editor.defaultFormatter": "foxundermoon.shell-format"
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+        },
+        "shellformat.path": "/go/bin/shfmt",
+        "editor.formatOnSave": true,
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh"
+          }
+        }
+      },
+
+      "extensions": [
+        "golang.go",
+        "esbenp.prettier-vscode",
+        "foxundermoon.shell-format",
+        "exiasr.hadolint",
+        "ms-azuretools.vscode-docker",
+        "DavidAnson.vscode-markdownlint",
+        "vivaxy.vscode-conventional-commits"
+      ]
     }
   },
-
-  // Add the IDs of extensions you want installed when the container is created.
-  "extensions": [
-    "golang.go",
-    "esbenp.prettier-vscode",
-    "foxundermoon.shell-format",
-    "exiasr.hadolint",
-    "ms-azuretools.vscode-docker",
-    "DavidAnson.vscode-markdownlint",
-    "vivaxy.vscode-conventional-commits"
-  ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [],
