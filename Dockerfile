@@ -138,11 +138,11 @@ ARG DOCKER_COMPOSE_VERSION=1.29.2
 ENV DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION}
 
 
-# renovate: datasource=repology depName=python3 versioning=loose
+# renovate: datasource=repology depName=debian_11/python3 versioning=loose
 ARG PYTHON_VERSION=3.9.2
 ENV PYTHON_VERSION=${PYTHON_VERSION}
 
-# renovate: datasource=repology depName=python3 versioning=loose
+# renovate: datasource=repology depName=debian_11/python3 versioning=loose
 ARG PIP_VERSION=20.3.4
 ENV PIP_VERSION=${PIP_VERSION}
 
