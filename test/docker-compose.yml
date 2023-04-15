@@ -22,4 +22,4 @@ services:
       - K6_ITERATIONS
       - TEST_ID
   nginx:
-    image: "nginx:1.23.3-alpine"
+    image: "nginx:1.24.0-alpine"
