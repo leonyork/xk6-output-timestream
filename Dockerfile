@@ -106,7 +106,7 @@ ARG LESS_VERSION=551
 ENV LESS_VERSION=${LESS_VERSION}
 
 # renovate: datasource=github-releases depName=nodejs/node
-ARG NODE_VERSION=19.9.0
+ARG NODE_VERSION=v20.0.0
 ENV NODE_VERSION=${NODE_VERSION}
 
 # hadolint ignore=DL3009
