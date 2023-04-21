@@ -105,12 +105,12 @@ RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION} \
 ARG LESS_VERSION=551
 ENV LESS_VERSION=${LESS_VERSION}
 
-# renovate: datasource=github-releases depName=nodejs/node
-ARG NODE_VERSION=19.9.0
+# renovate: datasource=github-releases depName=nodejs/node extractVersion='^(?<version>v\\d+\\.\\d+)'
+ARG NODE_VERSION=20.0.0
 ENV NODE_VERSION=${NODE_VERSION}
 
 # hadolint ignore=DL3009
-RUN curl -fsSL https://deb.nodesource.com/setup_19.x \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x \
   | bash - \
   && apt-get update \
   && apt-get install -y \
