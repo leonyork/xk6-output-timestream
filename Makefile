@@ -1,5 +1,5 @@
 # renovate: datasource=docker depName=loadimpact/k6 versioning=docker
-export K6_VERSION=0.43.0
+export K6_VERSION=0.43.1
 export K6_LOCATION?=$(GOPATH)/bin/k6
 REPO=github.com/leonyork/xk6-output-timestream
 ENV?=dev
