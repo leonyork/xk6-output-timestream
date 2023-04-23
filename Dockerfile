@@ -111,7 +111,7 @@ RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION} \
 ARG LESS_VERSION=551
 ENV LESS_VERSION=${LESS_VERSION}
 
-# renovate: datasource=github-releases depName=nodejs/node extractVersion=^v(?<version>.*)$
+# renovate: datasource=github-tags depName=nodejs/node extractVersion=^v(?<version>.*)$
 ARG NODE_VERSION=20.0.0
 ENV NODE_VERSION=${NODE_VERSION}
 
