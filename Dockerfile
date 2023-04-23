@@ -121,7 +121,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x \
 
 # Prettier for formatting
 # renovate: datasource=npm depName=prettier
-ARG PRETTIER_VERSION=2.8.7
+ARG PRETTIER_VERSION=2.8.8
 ENV PRETTIER_VERSION=${PRETTIER_VERSION}
 RUN npm install --global prettier@${PRETTIER_VERSION}
 
