@@ -115,12 +115,8 @@ ENV LESS_VERSION=${LESS_VERSION}
 ARG NODE_VERSION=20.0.0
 ENV NODE_VERSION=${NODE_VERSION}
 
-# renovate: datasource=github-releases depName=nodejs/node extractVersion=^v(?<version>\d+)\..*
-ARG NODE_SETUP_SCRIPT_VERSION=20
-ENV NODE_SETUP_SCRIPT_VERSION=${NODE_SETUP_SCRIPT_VERSION}
-
 # hadolint ignore=DL3009
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_SETUP_SCRIPT_VERSION}.x \
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION%.*.*}.x \
   | bash - \
   && apt-get update \
   && apt-get install -y \
