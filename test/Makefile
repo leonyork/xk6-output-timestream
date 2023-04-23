@@ -20,8 +20,8 @@ DOCKER_K6_ARGS:=-e K6_TIMESTREAM_REGION -e K6_TIMESTREAM_DATABASE_NAME -e K6_TIM
 export TEST_ID=$(shell date +%s)
 .PHONY: test
 test:
-	docker-compose build $(FIXTURE_BUILD_ARGS)
-	docker-compose up --exit-code-from test
+	docker compose build $(FIXTURE_BUILD_ARGS)
+	docker compose up --exit-code-from test
 	docker build -t $(TEST_IMAGE_NAME) --quiet .
 	@echo $$TEST_ID
 	docker run $(DOCKER_AWS_ARGS) $(DOCKER_K6_ARGS) -e TEST_ID -v "$(AWS_CONFIG_FILE)":"/root/.aws" $(TEST_IMAGE_NAME)

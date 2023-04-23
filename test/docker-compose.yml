@@ -21,5 +21,15 @@ services:
       - K6_VUS
       - K6_ITERATIONS
       - TEST_ID
+    links:
+      - nginx
+    depends_on:
+      nginx:
+        condition: service_healthy
   nginx:
     image: "nginx:1.24.0-alpine"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 2s
+      timeout: 10s
+      retries: 5

@@ -35,6 +35,11 @@ ENV LSB_VERSION=${LSB_VERSION}
 ARG DOCKER_VERSION=23.0.4
 ENV DOCKER_VERSION=${DOCKER_VERSION}
 
+# docker-compose for running integration tests
+# renovate: datasource=github-releases depName=docker/compose
+ARG DOCKER_COMPOSE_PLUGIN_VERSION=2.17.2
+ENV DOCKER_COMPOSE_PLUGIN_VERSION=${DOCKER_COMPOSE_PLUGIN_VERSION}
+
 RUN apt-get update \ 
   && apt-get install -y \
   gnupg=${GNUPG_VERSION}* \
@@ -52,6 +57,7 @@ RUN apt-get update \
   && apt-get update \
   && apt-get install -y \
   docker-ce-cli=5:${DOCKER_VERSION}* \
+  docker-compose-plugin=${DOCKER_COMPOSE_PLUGIN_VERSION}* \
   --no-install-recommends \
   && apt-get clean
 
@@ -136,27 +142,6 @@ ENV UPLIFT_VERSION=${UPLIFT_VERSION}
 RUN curl -fsSL https://raw.githubusercontent.com/gembaadvantage/uplift/main/scripts/install \
   | bash -s -- -v ${UPLIFT_VERSION} --no-sudo
 
-# docker-compose for running integration tests
-# renovate: datasource=pypi depName=docker-compose
-ARG DOCKER_COMPOSE_VERSION=1.29.2
-ENV DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION}
-
-
-# renovate: datasource=repology depName=debian_11/python3.9 versioning=loose
-ARG PYTHON_VERSION=3.9.2
-ENV PYTHON_VERSION=${PYTHON_VERSION}
-
-# renovate: datasource=repology depName=debian_11/python-pip versioning=loose
-ARG PIP_VERSION=20.3.4
-ENV PIP_VERSION=${PIP_VERSION}
-
-RUN apt-get update \ 
-  && apt-get install -y \
-  python3=${PYTHON_VERSION}* \
-  python3-pip=${PIP_VERSION}* \
-  --no-install-recommends \
-  && apt-get clean \
-  && pip install --no-cache-dir docker-compose==${DOCKER_COMPOSE_VERSION}
 
 #################################################
 # Build k6 with the extension
