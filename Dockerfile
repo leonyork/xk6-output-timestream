@@ -23,7 +23,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Docker CLI for integration tests
 
-# renovate: datasource=repology depName=debian_11/gnupg versioning=loose
+# renovate: datasource=repology depName=debian_11/gnupg2 versioning=loose
 ARG GNUPG_VERSION=2.2.27
 ENV GNUPG_VERSION=${GNUPG_VERSION}
 
@@ -105,12 +105,16 @@ RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION} \
 ARG LESS_VERSION=551
 ENV LESS_VERSION=${LESS_VERSION}
 
-# renovate: datasource=github-releases depName=nodejs/node extractVersion='^(?<version>v\\d+\\.\\d+)'
+# renovate: datasource=github-releases depName=nodejs/node extractVersion=^v(?<version>.*)$
 ARG NODE_VERSION=20.0.0
 ENV NODE_VERSION=${NODE_VERSION}
 
+# renovate: datasource=github-releases depName=nodejs/node extractVersion=^v(?<version>\d+)\..*
+ARG NODE_SETUP_SCRIPT_VERSION=20
+ENV NODE_SETUP_SCRIPT_VERSION=${NODE_SETUP_SCRIPT_VERSION}
+
 # hadolint ignore=DL3009
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x \
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_SETUP_SCRIPT_VERSION}.x \
   | bash - \
   && apt-get update \
   && apt-get install -y \
@@ -138,11 +142,11 @@ ARG DOCKER_COMPOSE_VERSION=1.29.2
 ENV DOCKER_COMPOSE_VERSION=${DOCKER_COMPOSE_VERSION}
 
 
-# renovate: datasource=repology depName=debian_11/python3 versioning=loose
+# renovate: datasource=repology depName=debian_11/python3.9 versioning=loose
 ARG PYTHON_VERSION=3.9.2
 ENV PYTHON_VERSION=${PYTHON_VERSION}
 
-# renovate: datasource=repology depName=debian_11/python3 versioning=loose
+# renovate: datasource=repology depName=debian_11/python-pip versioning=loose
 ARG PIP_VERSION=20.3.4
 ENV PIP_VERSION=${PIP_VERSION}
 
@@ -163,7 +167,7 @@ ARG K6_VERSION=$K6_VERSION
 
 WORKDIR /app
 COPY . .
-RUN make K6_VERSION=v$K6_VERSION build
+RUN make K6_VERSION=$K6_VERSION build
 
 
 #################################################

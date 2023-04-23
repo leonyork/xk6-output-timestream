@@ -1,5 +1,5 @@
-# renovate: datasource=docker depName=loadimpact/k6 versioning=docker extractVersion=^v(?<version>.*)$
-export K6_VERSION=v0.43.0
+# renovate: datasource=docker depName=loadimpact/k6 versioning=docker
+export K6_VERSION=0.43.0
 export K6_LOCATION?=$(GOPATH)/bin/k6
 REPO=github.com/leonyork/xk6-output-timestream
 ENV?=dev
@@ -10,7 +10,7 @@ all: build test-unit format check build-image deploy-infra test-integration dest
 
 .PHONY: build
 build:
-	xk6 build $(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
+	xk6 build v$(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
 
 .PHONY: test-unit
 test-unit:
@@ -122,17 +122,16 @@ push-builder:
 	docker push $(BUILDER_NAME)
 
 # In Dockerhub the versions are without the leading 'v'
-K6_VERSION_NO_V=$(subst v,,$(K6_VERSION))
-export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)
+export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION)
 
 VERSION=$(shell git tag -l --contains HEAD | grep '^v')
 VERSION_NO_V=$(subst v,,$(VERSION))
 ifneq ($(VERSION_NO_V),)
-	export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION_NO_V)-timestream$(VERSION_NO_V)
+	export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION)-timestream$(VERSION_NO_V)
 endif
 .PHONY: build-image
 build-image: 
-	docker build --target k6 --build-arg K6_VERSION=$(K6_VERSION_NO_V) --build-arg VERSION=$(VERSION) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
+	docker build --target k6 --build-arg K6_VERSION=$(K6_VERSION) --build-arg VERSION=$(VERSION) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
 
 .PHONY: push-image
 push-image:
