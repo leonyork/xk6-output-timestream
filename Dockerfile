@@ -36,7 +36,7 @@ ARG DOCKER_VERSION=23.0.4
 ENV DOCKER_VERSION=${DOCKER_VERSION}
 
 # docker-compose for running integration tests
-# renovate: datasource=github-releases depName=docker/compose
+# renovate: datasource=github-releases depName=docker/compose extractVersion=^v(?<version>.*)$
 ARG DOCKER_COMPOSE_PLUGIN_VERSION=2.17.2
 ENV DOCKER_COMPOSE_PLUGIN_VERSION=${DOCKER_COMPOSE_PLUGIN_VERSION}
 

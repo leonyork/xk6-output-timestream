@@ -1,18 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base",
-    "regexManagers:dockerfileVersions",
-    "docker:enableMajor"
-  ],
+  "extends": ["config:base", "docker:enableMajor"],
   "ignorePaths": [],
   "regexManagers": [
     {
-      "fileMatch": ["Makefile"],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s.*_VERSION *\\= *(?<currentValue>.+)"
+      "fileMatch": [
+        "(^|/|\\.)Dockerfile$",
+        "(^|/)Dockerfile[^/]*$",
+        "Makefile"
       ],
-      "versioningTemplate": "{{#if versioning}}{{versioning}}{{else}}semver{{/if}}"
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*.*_VERSION *[:?]?\\= *(?<currentValue>.+)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      "extractVersionTemplate": "{{#if extractVersion}}{{{extractVersion}}}{{else}}^(?<version>.+)${{/if}}"
     }
   ]
 }
