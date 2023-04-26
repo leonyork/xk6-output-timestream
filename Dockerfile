@@ -37,7 +37,7 @@ ENV DOCKER_VERSION=${DOCKER_VERSION}
 
 # docker-compose for running integration tests
 # renovate: datasource=github-releases depName=docker/compose extractVersion=^v(?<version>.*)$
-ARG DOCKER_COMPOSE_PLUGIN_VERSION=2.17.2
+ARG DOCKER_COMPOSE_PLUGIN_VERSION=2.17.3
 ENV DOCKER_COMPOSE_PLUGIN_VERSION=${DOCKER_COMPOSE_PLUGIN_VERSION}
 
 RUN apt-get update \ 
