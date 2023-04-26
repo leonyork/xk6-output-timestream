@@ -32,7 +32,7 @@ ARG LSB_VERSION=11.1.0
 ENV LSB_VERSION=${LSB_VERSION}
 
 # renovate: datasource=docker depName=docker versioning=docker
-ARG DOCKER_VERSION=23.0.4
+ARG DOCKER_VERSION=23.0.5
 ENV DOCKER_VERSION=${DOCKER_VERSION}
 
 # docker-compose for running integration tests
