@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # renovate: datasource=docker depName=loadimpact/k6 versioning=docker
 ARG K6_VERSION=0.44.0
 
@@ -11,6 +13,12 @@ ARG XK6_VERSION=v0.9.1
 ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
+# Docker CLI for integration tests
+FROM docker:23.0.4-cli AS docker-cli
+
+# Hadolint for formatting Dockerfiles
+FROM hadolint/hadolint:v2.12.0-debian AS hadolint
+
 #################################################
 # Used for development and CI. Any development
 # specific customisations should go in
@@ -21,47 +29,10 @@ FROM builder AS ci
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Docker CLI for integration tests
-
-# renovate: datasource=repology depName=debian_11/gnupg2 versioning=loose
-ARG GNUPG_VERSION=2.2.27
-ENV GNUPG_VERSION=${GNUPG_VERSION}
-
-# renovate: datasource=repology depName=debian_11/lsb versioning=loose
-ARG LSB_VERSION=11.1.0
-ENV LSB_VERSION=${LSB_VERSION}
-
-# renovate: datasource=docker depName=docker versioning=docker
-ARG DOCKER_VERSION=23.0.5
-ENV DOCKER_VERSION=${DOCKER_VERSION}
-
-# docker-compose for running integration tests
-# renovate: datasource=github-releases depName=docker/compose extractVersion=^v(?<version>.*)$
-ARG DOCKER_COMPOSE_PLUGIN_VERSION=2.17.3
-ENV DOCKER_COMPOSE_PLUGIN_VERSION=${DOCKER_COMPOSE_PLUGIN_VERSION}
-
-RUN apt-get update \ 
-  && apt-get install -y \
-  gnupg=${GNUPG_VERSION}* \
-  lsb-release=${LSB_VERSION} \
-  --no-install-recommends \
-  && mkdir -p /etc/apt/keyrings \
-  && curl -fsSL https://download.docker.com/linux/debian/gpg | \
-  gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
-  && echo \
-  "deb [arch=$(dpkg --print-architecture) \
-  signed-by=/etc/apt/keyrings/docker.gpg] \
-  https://download.docker.com/linux/debian \
-  $(lsb_release -cs) stable" | \
-  tee /etc/apt/sources.list.d/docker.list >/dev/null \
-  && apt-get update \
-  && apt-get install -y \
-  docker-ce-cli=5:${DOCKER_VERSION}* \
-  docker-compose-plugin=${DOCKER_COMPOSE_PLUGIN_VERSION}* \
-  --no-install-recommends \
-  && apt-get clean
-
-# AWS CLI for integration tests
+COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/libexec/docker/cli-plugins/docker-buildx
+RUN docker buildx install
+COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/libexec/docker/cli-plugins/docker-compose
 
 # renovate: datasource=repology depName=debian_11/unzip versioning=loose
 ARG UNZIP_VERSION=6.0
@@ -81,15 +52,7 @@ RUN apt-get update \
   && rm -rf ./aws
 
 # Hadolint for linting Dockerfile
-
-# renovate: datasource=github-releases depName=hadolint/hadolint
-ARG HADOLINT_VERSION=v2.12.0
-ENV HADOLINT_VERSION=${HADOLINT_VERSION}
-
-RUN curl -fsSL \
-  "https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
-  -o /usr/local/bin/hadolint \
-  && chmod +x /usr/local/bin/hadolint
+COPY --from=hadolint /bin/hadolint /usr/local/bin/hadolint
 
 # shfmt for formatting shell scripts
 # & golines for formatting go files
