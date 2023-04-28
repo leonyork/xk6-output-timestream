@@ -16,7 +16,10 @@ apt-get install -y \
 
 # Useful tools
 apt-get update
-apt-get install -y zsh
+apt-get install -y \
+	zsh \
+	python3 \
+	python3-pip
 
 chmod -R +x .git/hooks
 
