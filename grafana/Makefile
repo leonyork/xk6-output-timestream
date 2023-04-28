@@ -1,6 +1,6 @@
 IMAGE_NAME=grafana-oss
 # renovate: datasource=docker depName=grafana/grafana-oss versioning=docker
-GRAFANA_VERSION:=9.4.7
+GRAFANA_VERSION:=9.5.1
 FULL_IMAGE_NAME=$(IMAGE_NAME):$(GRAFANA_VERSION)
 
 VERSION=$(shell git tag -l --contains HEAD | grep '^v')
