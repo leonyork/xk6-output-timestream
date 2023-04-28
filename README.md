@@ -10,7 +10,11 @@ If you're here you've probably chosen to use k6 already and you're probably inte
 - Low cost
 - Great Developer experience
 
-For more information see [the alternatives](docs/Alternatives.md)
+For more information see [the alternatives](docs/Alternatives.md).
+
+Using this extension lets you hook up K6 to AWS Timestream - plus you get a nice looking [Grafana](https://grafana.com/grafana/dashboards/) dashboard 😉.
+
+![Example Grafana dashboard](docs/dashboard.png)
 
 ## Usage
 
@@ -111,3 +115,13 @@ To deploy the Timestream database run `make deploy-infra`.
 To run the tests (build, run and query steps above) run `make test-integration`. Note that you will need to build the k6 image first with `make build-image`.
 
 To destroy the Timestream database run `make destroy-infra`.
+
+#### Grafana
+
+Testing of the Grafana dashboard is manual:
+
+1. `export K6_ITERATIONS=40000` - to get a reasonable number of results, set the number of iterations to a large number.
+2. `make deploy-infra` - to deploy the infrastructure.
+3. `make test-integration` - to run the tests. These will likely fail as the number of iterations is not what the tests expect.
+4. `make grafana-build grafana-run` and browse to <http://localhost:3000>. From the dashboard you'll see the results come in. It should look like the dashboard near the top.
+5. `make destroy-infra` - to destroy the infrastructure once you're done testing.
