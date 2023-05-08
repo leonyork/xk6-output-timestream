@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=loadimpact/k6 versioning=docker
-ARG K6_VERSION=0.44.0
+ARG K6_VERSION=0.44.1
 
 #################################################
 # Basic environment for building the app
