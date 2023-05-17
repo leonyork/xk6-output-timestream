@@ -14,7 +14,7 @@ ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
 # Docker CLI for integration tests
-FROM docker:23.0.6-cli AS docker-cli
+FROM docker:24.0.0-cli AS docker-cli
 
 # Hadolint for formatting Dockerfiles
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
