@@ -9,7 +9,7 @@ ARG K6_VERSION=0.44.1
 FROM golang:1.20.5-bullseye AS builder
 
 # renovate: datasource=go depName=go.k6.io/xk6
-ARG XK6_VERSION=v0.9.1
+ARG XK6_VERSION=v0.9.2
 ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
