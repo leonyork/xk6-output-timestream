@@ -58,7 +58,7 @@ COPY --from=hadolint /bin/hadolint /usr/local/bin/hadolint
 # & golines for formatting go files
 
 # renovate: datasource=go depName=mvdan.cc/sh/v3
-ARG SHFMT_VERSION=v3.6.0
+ARG SHFMT_VERSION=v3.7.0
 ENV SHFMT_VERSION=${SHFMT_VERSION}
 
 # renovate: datasource=go depName=github.com/segmentio/golines
