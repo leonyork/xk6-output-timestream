@@ -75,7 +75,7 @@ ARG LESS_VERSION=551
 ENV LESS_VERSION=${LESS_VERSION}
 
 # renovate: datasource=github-tags depName=nodejs/node extractVersion=^v(?<version>.*)$
-ARG NODE_VERSION=20.3.1
+ARG NODE_VERSION=20.4.0
 ENV NODE_VERSION=${NODE_VERSION}
 
 # hadolint ignore=DL3009
