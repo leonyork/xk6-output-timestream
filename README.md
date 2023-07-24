@@ -8,7 +8,7 @@ If you're here you've probably chosen to use k6 already and you're probably inte
 
 - Performance at scale
 - Low cost
-- Great Developer experience
+- Great developer experience
 
 For more information see [the alternatives](docs/Alternatives.md).
 
@@ -27,6 +27,8 @@ You can use this extension by either:
 - Building this extension into K6 - see [the custom build instructions](https://github.com/grafana/xk6#custom-builds).
 
 ### Configuration
+
+Include the argument `--out timestream` when using the `k6 run` command - see the [K6 docs](https://k6.io/docs/get-started/results-output/#time-series-and-external-outputs)
 
 For all configuration specific to this extension see the `Config struct` in [config.go](config.go).
 
