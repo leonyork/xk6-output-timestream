@@ -12,7 +12,7 @@ If you're here you've probably chosen to use k6 already and you're probably inte
 
 For more information see [the alternatives](docs/Alternatives.md).
 
-Using this extension lets you hook up K6 to AWS Timestream - plus you get a nice looking [Grafana](https://grafana.com/grafana/dashboards/) dashboard 😉.
+Using this extension lets you hook up K6 to AWS Timestream - plus you get a nice looking [Grafana](https://grafana.com/grafana/dashboards/) dashboard 😉 based off the [K6 Load Testing Results dashboard](https://grafana.com/grafana/dashboards/2587-k6-load-testing-results/).
 
 ![Example Grafana dashboard](docs/dashboard.png)
 
