@@ -14,7 +14,7 @@ datasources:
     isDefault: true
     jsonData:
       authType: default
-      defaultRegion: us-east-1
+      defaultRegion: $AWS_REGION
       defaultDatabase: dev-xk6-output-timestream-test
       defaultTable: test
     version: 1
