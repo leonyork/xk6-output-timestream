@@ -9,6 +9,7 @@ package timestream
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -80,20 +81,20 @@ func (o *Output) Description() string {
 }
 
 func (o *Output) Start() error {
-	o.logger.Debug("Starting...")
+	o.logger.Debug("starting...")
 	o.metricSampleContainerQueue = make(chan *metrics.SampleContainer)
 	o.doneWriting = make(chan bool)
 	go o.metricSamplesHandler()
-	o.logger.Debug("Started!")
+	o.logger.Debug("started!")
 	return nil
 }
 
 func (o *Output) Stop() error {
-	o.logger.Debug("Stopping...")
+	o.logger.Debug("stopping...")
 	close(o.metricSampleContainerQueue)
-	o.logger.Debug("Closed MetricSampleContainerQueue")
+	o.logger.Debug("closed MetricSampleContainerQueue")
 	<-o.doneWriting
-	o.logger.Debug("Stopped!")
+	o.logger.Debug("stopped!")
 	return nil
 }
 
@@ -129,7 +130,7 @@ func (o *Output) metricSamplesHandler() {
 	}
 
 	wg.Wait()
-	o.logger.Debug("Metric samples handler done")
+	o.logger.Debug("metric samples handler done")
 	o.doneWriting <- true
 }
 
@@ -199,24 +200,21 @@ func (o *Output) writeRecordsAsync(
 			WithField("records_address", &recordsToSave)
 
 		logger.WithField("t", time.Since(*startTime)).
-			Debug("Starting write")
+			Debug("starting write")
 
 		startWriteTime := time.Now()
 		countSaved, err := o.writeRecords(recordsToSave)
 
+		logger = logger.
+			WithField("t", time.Since(*startTime)).
+			WithField("duration", time.Since(startWriteTime))
 		if err != nil {
-			logger.
-				WithField("t", time.Since(*startTime)).
-				WithField("duration", time.Since(startWriteTime)).
-				WithError(err).
-				Error("Failed to write")
+			logTimestreamError(logger, err)
 			return
 		}
 		logger.
-			WithField("t", time.Since(*startTime)).
-			WithField("duration", time.Since(startWriteTime)).
 			WithField("count_saved", countSaved).
-			Debug("Wrote metrics")
+			Debug("wrote metrics")
 	}(&records)
 }
 
@@ -234,4 +232,21 @@ func (o *Output) writeRecords(records *[]types.Record) (int32, error) {
 	}
 
 	return response.RecordsIngested.Total, nil
+}
+
+func logTimestreamError(logger logrus.FieldLogger, err error) {
+	logger.
+		WithError(err).
+		Error("failed to write")
+
+	var rejected *types.RejectedRecordsException
+	if errors.As(err, &rejected) {
+		for _, rr := range rejected.RejectedRecords {
+			logger.Errorf(
+				"reject reason: %q, record index: %d",
+				aws.ToString(rr.Reason),
+				rr.RecordIndex,
+			)
+		}
+	}
 }
