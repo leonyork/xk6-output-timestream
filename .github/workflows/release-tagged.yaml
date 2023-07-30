@@ -41,25 +41,12 @@ jobs:
         with:
           name: CHANGELOG.md
           path: ./
-      - name: Download k6 executable (x86_64)
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          workflow: build-test-tag.yaml
-          workflow_conclusion: success
-          commit: ${{github.sha}}
-          name: k6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Login ghcr.io
         run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
-      - name: Pull built CI image to cache
-        run: docker pull ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
-      - name: Tag cached image
-        run: |
-          make \
-            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
-            VERSION=${{ github.ref_name }} \
-            CACHE_NAME=ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
-            tag-cached-image \
-            push-image
+      - name: Re-Tag image
+        run: docker buildx imagetools create -t ghcr.io/${{ github.repository_owner }}/k6:${{ github.ref_name }} ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
       - name: Update changelog with tagged image
         run: |
           make \
@@ -82,10 +69,27 @@ jobs:
             GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
             VERSION=${{ github.ref_name }} \
             grafana-update-changelog
-      - run: make VERSION=${{ github.ref_name }} release-github
+      - name: Download k6 executable (amd64)
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-test-tag.yaml
+          workflow_conclusion: success
+          commit: ${{ github.sha }}
+          name: k6-amd64
+      - name: Download k6 executable (arm64)
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build-test-tag.yaml
+          workflow_conclusion: success
+          commit: ${{ github.sha }}
+          name: k6-arm64
+      - run: |
+          gh release create $(VERSION) \
+            './k6-amd64#K6 amd64 executable with timestream' \
+            './k6-arm64#K6 arm64 executable with timestream' \
+            -F CHANGELOG.md
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          K6_LOCATION: "./k6"
 
   release-go-package:
     needs:

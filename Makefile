@@ -58,7 +58,7 @@ format: fmt prettier shfmt
 
 # Check the code - will fail if checks fail
 .PHONY: check
-check: prettier-check hadolint-check shfmt-check
+check: prettier-check hadolint-check shfmt-check go-vet-check
 	@echo Code checking complete
 
 # Formatting with go fmt (golang)
@@ -83,6 +83,11 @@ hadolint-check:
 	@hadolint test/test.Dockerfile
 	@hadolint grafana/Dockerfile
 	@echo Hadolint Passed
+
+.PHONY: go-vet-check
+go-vet-check:
+	@go vet
+	@echo go vet Passed
 
 # Formatting with shfmt (shell scripts)
 .PHONY: shfmt
@@ -129,9 +134,15 @@ VERSION_NO_V=$(subst v,,$(VERSION))
 ifneq ($(VERSION_NO_V),)
 	export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION)-timestream$(VERSION_NO_V)
 endif
+DOCKER_BUILD_CMD=build
+ifneq ($(PLATFORM),)
+	PLATFORM_ARG=--platform $(PLATFORM)
+	EXTRA_ARGS=$(PLATFORM_ARG) --load
+	DOCKER_BUILD_CMD=buildx build
+endif
 .PHONY: build-image
-build-image: 
-	docker build --target k6 --build-arg K6_VERSION=$(K6_VERSION) --build-arg VERSION=$(VERSION) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
+build-image:
+	docker $(DOCKER_BUILD_CMD) --target k6 --build-arg K6_VERSION=$(K6_VERSION) --build-arg VERSION=$(VERSION) $(EXTRA_ARGS) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
 
 .PHONY: push-image
 push-image:
@@ -147,12 +158,8 @@ update-changelog:
 
 .PHONY: copy-k6-from-image
 copy-k6-from-image:
-	docker cp $$(docker create --name tc $(FULL_IMAGE_NAME)):/usr/bin/k6 $(K6_LOCATION)
+	docker cp $$(docker create $(PLATFORM_ARG) --name tc $(FULL_IMAGE_NAME)):/usr/bin/k6 $(K6_LOCATION)
 	docker rm tc
-
-.PHONY: tag-cached-image
-tag-cached-image:
-	docker tag $(CACHE_NAME) $(FULL_IMAGE_NAME)
 
 # Tags the repo
 # See https://upliftci.dev/
@@ -168,11 +175,6 @@ release-go:
 changelog:
 	uplift changelog --no-stage --no-push --ignore-detached
 
-.PHONY: release-github
-release-github:
-	gh release create $(VERSION) \
-    '$(K6_LOCATION)#K6 x86_64 executable with timestream' \
-    -F CHANGELOG.md
 
 #################################################
 # Example grafana setup
