@@ -26,6 +26,7 @@ jobs:
       # Seems to need the CI container on Github Actions rather
       # than just the builder image :(
       builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
+      image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
     needs:
       - prepare
 
