@@ -161,6 +161,10 @@ copy-k6-from-image:
 	docker cp $$(docker create $(PLATFORM_ARG) --name tc $(FULL_IMAGE_NAME)):/usr/bin/k6 $(K6_LOCATION)
 	docker rm tc
 
+.PHONY: retag-image
+retag-image:
+	docker buildx imagetools create -t $(FULL_IMAGE_NAME) $(CACHE_NAME)
+
 # Tags the repo
 # See https://upliftci.dev/
 .PHONY: release-tag

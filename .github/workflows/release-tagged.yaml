@@ -46,7 +46,12 @@ jobs:
       - name: Login ghcr.io
         run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
       - name: Re-Tag image
-        run: docker buildx imagetools create -t ghcr.io/${{ github.repository_owner }}/k6:${{ github.ref_name }} ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+        run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            VERSION=${{ github.ref_name }} \
+            CACHE_NAME=ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
+            retag-image
       - name: Update changelog with tagged image
         run: |
           make \
@@ -84,7 +89,7 @@ jobs:
           commit: ${{ github.sha }}
           name: k6-arm64
       - run: |
-          gh release create $(VERSION) \
+          gh release create ${{ github.ref_name }} \
             './k6-amd64#K6 amd64 executable with timestream' \
             './k6-arm64#K6 arm64 executable with timestream' \
             -F CHANGELOG.md
