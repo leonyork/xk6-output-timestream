@@ -39,7 +39,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
       - name: Configure AWS credentials
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment: Test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
       - name: Configure AWS credentials
@@ -80,7 +80,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
       - name: Configure AWS credentials

@@ -21,7 +21,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Needed so that we trigger the version tag action - see
           # https://github.com/orgs/community/discussions/27028#discussioncomment-3254367

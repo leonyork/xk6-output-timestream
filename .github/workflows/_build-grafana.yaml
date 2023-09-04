@@ -19,7 +19,7 @@ jobs:
     outputs:
       image: ${{ steps.set_image_name.outputs.image }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
       - name: Login ghcr.io
