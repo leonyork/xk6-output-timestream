@@ -29,7 +29,7 @@ jobs:
     outputs:
       image: ${{ inputs.image }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
       - name: Set up Docker Buildx

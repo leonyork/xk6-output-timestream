@@ -19,7 +19,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       # See https://github.com/actions/runner/issues/2033
@@ -35,7 +35,7 @@ jobs:
     needs:
       - create-changelog
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download CHANGELOG
         uses: actions/download-artifact@v3
         with:
@@ -106,5 +106,5 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: make VERSION=${{ github.ref_name }} release-go
