@@ -20,7 +20,7 @@ jobs:
       ci_builder_image: ${{ steps.ci_builder.outputs.image }}
     steps:
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_ref }}
