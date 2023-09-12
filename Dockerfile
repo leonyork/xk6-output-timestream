@@ -16,6 +16,9 @@ RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 # Docker CLI for integration tests
 FROM docker:24.0.6-cli AS docker-cli
 
+# Node for tooling
+FROM node:20.6.1-bullseye-slim AS node
+
 # Hadolint for formatting Dockerfiles
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
 
@@ -33,6 +36,8 @@ COPY --from=docker-cli /usr/local/bin/docker /usr/local/bin/docker
 COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-buildx /usr/libexec/docker/cli-plugins/docker-buildx
 RUN docker buildx install
 COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr/libexec/docker/cli-plugins/docker-compose
+COPY --from=node /usr/local/bin /usr/local/bin
+COPY --from=node /usr/local/lib /usr/local/lib
 
 # renovate: datasource=repology depName=debian_11/unzip versioning=loose
 ARG UNZIP_VERSION=6.0
@@ -68,23 +73,14 @@ ENV GOLINES_VERSION=${GOLINES_VERSION}
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION} \
   && go install github.com/segmentio/golines@${GOLINES_VERSION}
 
-# Node for prettier
-
 # renovate: datasource=repology depName=debian_11/less versioning=loose
 ARG LESS_VERSION=551
 ENV LESS_VERSION=${LESS_VERSION}
 
-# renovate: datasource=github-tags depName=nodejs/node extractVersion=^v(?<version>.*)$
-ARG NODE_VERSION=20.5.1
-ENV NODE_VERSION=${NODE_VERSION}
-
 # hadolint ignore=DL3009
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION%.*.*}.x \
-  | bash - \
-  && apt-get update \
+RUN apt-get update \
   && apt-get install -y \
   less=${LESS_VERSION}* \
-  nodejs=${NODE_VERSION}* \
   --no-install-recommends \
   && apt-get clean
 
