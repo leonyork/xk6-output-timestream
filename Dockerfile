@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-# renovate: datasource=docker depName=loadimpact/k6 versioning=docker
+# renovate: datasource=docker depName=grafana/k6 versioning=docker
 ARG K6_VERSION=0.47.0
 
 #################################################
@@ -114,7 +114,7 @@ RUN make K6_VERSION=$K6_VERSION build
 # "Update" the k6 official image
 #################################################
 
-FROM loadimpact/k6:$K6_VERSION AS k6
+FROM grafana/k6:$K6_VERSION AS k6
 ARG K6_VERSION=$K6_VERSION
 ARG VERSION=$VERSION
 
