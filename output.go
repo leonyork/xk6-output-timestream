@@ -44,6 +44,7 @@ type Output struct {
 	client TimestreamWriteClient
 	config *Config
 	logger logrus.FieldLogger
+	ctx    context.Context
 
 	metricSampleContainerQueue chan *metrics.SampleContainer
 	doneWriting                chan bool
@@ -55,7 +56,9 @@ func New(params output.Params) (output.Output, error) {
 		return nil, err
 	}
 
-	awsConfig, err := config.LoadDefaultConfig(context.TODO())
+	ctx := context.Background()
+
+	awsConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +72,7 @@ func New(params output.Params) (output.Output, error) {
 		client: client,
 		config: &extensionConfig,
 		logger: params.Logger.WithField("component", "timestream"),
+		ctx:    ctx,
 	}, nil
 }
 
@@ -225,7 +229,7 @@ func (o *Output) writeRecords(records *[]types.Record) (int32, error) {
 		Records:      *records,
 	}
 
-	response, err := o.client.WriteRecords(context.TODO(), writeRecordsInput)
+	response, err := o.client.WriteRecords(o.ctx, writeRecordsInput)
 
 	if err != nil {
 		return 0, err
