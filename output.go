@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -32,7 +33,7 @@ func init() {
 	output.RegisterExtension("timestream", New)
 }
 
-type TimestreamWriteClient interface {
+type WriteClient interface {
 	WriteRecords(
 		ctx context.Context,
 		params *timestreamwrite.WriteRecordsInput,
@@ -41,10 +42,9 @@ type TimestreamWriteClient interface {
 }
 
 type Output struct {
-	client TimestreamWriteClient
+	client WriteClient
 	config *Config
 	logger logrus.FieldLogger
-	ctx    context.Context
 
 	metricSampleContainerQueue chan *metrics.SampleContainer
 	doneWriting                chan bool
@@ -60,8 +60,9 @@ func New(params output.Params) (output.Output, error) {
 
 	awsConfig, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to load AWS config: %w", err)
 	}
+
 	if extensionConfig.Region != "" {
 		awsConfig.Region = extensionConfig.Region
 	}
@@ -72,7 +73,6 @@ func New(params output.Params) (output.Output, error) {
 		client: client,
 		config: &extensionConfig,
 		logger: params.Logger.WithField("component", "timestream"),
-		ctx:    ctx,
 	}, nil
 }
 
@@ -88,8 +88,10 @@ func (o *Output) Start() error {
 	o.logger.Debug("starting...")
 	o.metricSampleContainerQueue = make(chan *metrics.SampleContainer)
 	o.doneWriting = make(chan bool)
+
 	go o.metricSamplesHandler()
 	o.logger.Debug("started!")
+
 	return nil
 }
 
@@ -99,6 +101,7 @@ func (o *Output) Stop() error {
 	o.logger.Debug("closed MetricSampleContainerQueue")
 	<-o.doneWriting
 	o.logger.Debug("stopped!")
+
 	return nil
 }
 
@@ -111,21 +114,26 @@ func (o *Output) AddMetricSamples(samples []metrics.SampleContainer) {
 
 /**
  * Pulls together all the metrics in one place in the correct format for timestream
- * so that it can write the metrics when it reaches the TIMESTREAM_MAX_BATCH_SIZE
+ * so that it can write the metrics when it reaches the TimestreamMaxBatchSize.
  */
 func (o *Output) metricSamplesHandler() {
 	// See https://docs.aws.amazon.com/timestream/latest/developerguide/API_WriteRecords.html
-	TIMESTREAM_MAX_BATCH_SIZE := 100
-	var timestreamRecordsToSave []types.Record
-	var wg sync.WaitGroup
+	TimestreamMaxBatchSize := 100
+
+	var (
+		timestreamRecordsToSave []types.Record
+		wg                      sync.WaitGroup
+	)
+
 	start := time.Now()
+
 	for metricSampleContainer := range o.metricSampleContainerQueue {
 		timestreamRecordsForContainer := o.createRecords((*metricSampleContainer).GetSamples())
 		timestreamRecordsToSave = append(timestreamRecordsToSave, timestreamRecordsForContainer...)
 
-		if len(timestreamRecordsToSave) > TIMESTREAM_MAX_BATCH_SIZE {
-			o.writeRecordsAsync(timestreamRecordsToSave[:TIMESTREAM_MAX_BATCH_SIZE], &wg, &start)
-			timestreamRecordsToSave = timestreamRecordsToSave[TIMESTREAM_MAX_BATCH_SIZE:]
+		if len(timestreamRecordsToSave) > TimestreamMaxBatchSize {
+			o.writeRecordsAsync(timestreamRecordsToSave[:TimestreamMaxBatchSize], &wg, &start)
+			timestreamRecordsToSave = timestreamRecordsToSave[TimestreamMaxBatchSize:]
 		}
 	}
 
@@ -139,10 +147,11 @@ func (o *Output) metricSamplesHandler() {
 }
 
 /**
- * Mapping from K6 metrics to AWS Timstream records
+ * Mapping from K6 metrics to AWS Timstream records.
  */
 func (o *Output) createRecords(samples []metrics.Sample) []types.Record {
 	records := make([]types.Record, 0, len(samples))
+
 	for _, sample := range samples {
 		var dimensions []types.Dimension
 
@@ -174,11 +183,12 @@ func (o *Output) createRecords(samples []metrics.Sample) []types.Record {
 			MeasureValue:     aws.String(fmt.Sprintf("%.6f", sample.Value)),
 			MeasureValueType: "DOUBLE",
 			Time: aws.String(
-				fmt.Sprintf("%d", sample.GetTime().UnixNano()),
+				strconv.FormatInt(sample.GetTime().UnixNano(), 10),
 			),
 			TimeUnit: "NANOSECONDS",
 		})
 	}
+
 	return records
 }
 
@@ -188,7 +198,7 @@ func (o *Output) createRecords(samples []metrics.Sample) []types.Record {
  * slower than running on the CPU and can be done in
  * parallel. This ultimately means we don't end up
  * waiting for a long time after the tests have
- * finished for data to be written to the database
+ * finished for data to be written to the database.
  */
 func (o *Output) writeRecordsAsync(
 	records []types.Record,
@@ -196,6 +206,7 @@ func (o *Output) writeRecordsAsync(
 	startTime *time.Time,
 ) {
 	waitGroup.Add(1)
+
 	go func(recordsToSave *[]types.Record) {
 		defer waitGroup.Done()
 
@@ -214,8 +225,10 @@ func (o *Output) writeRecordsAsync(
 			WithField("duration", time.Since(startWriteTime))
 		if err != nil {
 			logTimestreamError(logger, err)
+
 			return
 		}
+
 		logger.
 			WithField("count_saved", countSaved).
 			Debug("wrote metrics")
@@ -229,10 +242,11 @@ func (o *Output) writeRecords(records *[]types.Record) (int32, error) {
 		Records:      *records,
 	}
 
-	response, err := o.client.WriteRecords(o.ctx, writeRecordsInput)
+	ctx := context.Background()
 
+	response, err := o.client.WriteRecords(ctx, writeRecordsInput)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("unable to write records to timestream: %w", err)
 	}
 
 	return response.RecordsIngested.Total, nil

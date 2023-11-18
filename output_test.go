@@ -16,6 +16,7 @@ import (
 
 func TestDescription(t *testing.T) {
 	t.Parallel()
+
 	output := &Output{config: &Config{
 		DatabaseName: "testdb",
 		TableName:    "testtable",
@@ -28,7 +29,7 @@ func TestDescription(t *testing.T) {
 }
 
 type TimestreamWriteClientMock struct {
-	TimestreamWriteClient
+	WriteClient
 	mockWriteRecords func(ctx context.Context,
 		params *timestreamwrite.WriteRecordsInput,
 		optFns ...func(*timestreamwrite.Options)) (*timestreamwrite.WriteRecordsOutput, error)
@@ -58,13 +59,17 @@ func (to testOutput) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func NewTestOutput(t testing.TB) io.Writer {
-	return testOutput{t}
+func NewTestOutput(tb testing.TB) io.Writer {
+	tb.Helper()
+
+	return testOutput{tb}
 }
 
-func NewLogger(t testing.TB) *logrus.Logger {
+func NewLogger(tb testing.TB) *logrus.Logger {
+	tb.Helper()
+
 	l := logrus.New()
-	logrus.SetOutput(NewTestOutput(t))
+	logrus.SetOutput(NewTestOutput(tb))
 
 	return l
 }
@@ -73,18 +78,22 @@ func TestFlushMetricsBatching(t *testing.T) {
 	type SampleContainerTest struct {
 		sampleCount int
 	}
+
 	type WriteRecordTest struct {
 		writeCount int
 	}
+
 	createSampleContainers := func(
 		numSampleContainers int,
-		numSamplesPerContainer int) []SampleContainerTest {
+		numSamplesPerContainer int,
+	) []SampleContainerTest {
 		sampleContainers := make([]SampleContainerTest, numSampleContainers)
 		for i := range sampleContainers {
 			sampleContainers[i] = SampleContainerTest{
 				sampleCount: numSamplesPerContainer,
 			}
 		}
+
 		return sampleContainers
 	}
 	createWriteRecords := func(numWrites ...int) []WriteRecordTest {
@@ -94,6 +103,7 @@ func TestFlushMetricsBatching(t *testing.T) {
 				writeCount: num,
 			}
 		}
+
 		return writeRecords
 	}
 	tests := []struct {
@@ -148,15 +158,15 @@ func TestFlushMetricsBatching(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			r := metrics.NewRegistry()
+			reg := metrics.NewRegistry()
 			sampleContainers := make([]metrics.SampleContainer, len(test.sampleContainers))
 			for i, testSampleContainer := range test.sampleContainers {
 				samples := make([]metrics.Sample, testSampleContainer.sampleCount)
 				for j := range samples {
 					samples[j] = metrics.Sample{
 						TimeSeries: metrics.TimeSeries{
-							Metric: r.MustNewMetric("test_metric", metrics.Counter),
-							Tags: r.RootTagSet().
+							Metric: reg.MustNewMetric("test_metric", metrics.Counter),
+							Tags: reg.RootTagSet().
 								With("key", "val"),
 						},
 						Time:  time.UnixMicro(int64(j)),
@@ -196,7 +206,7 @@ func TestFlushMetricsBatching(t *testing.T) {
 			}
 
 			close(queue)
-			var actualWriteRecords = make([]timestreamwrite.WriteRecordsInput, actualNumberOfWriteRecords)
+			actualWriteRecords := make([]timestreamwrite.WriteRecordsInput, actualNumberOfWriteRecords)
 			for queueItem := range queue {
 				actualWriteRecords = append(actualWriteRecords, *queueItem)
 			}
@@ -212,6 +222,7 @@ func TestFlushMetricsBatching(t *testing.T) {
 					found = true
 					// Remove the found one from the list
 					actualWriteRecords = append(actualWriteRecords[:i], actualWriteRecords[i+1:]...)
+
 					break
 				}
 				if !found {
@@ -313,15 +324,18 @@ func TestCreateRecords(t *testing.T) {
 	records := output.createRecords(samples)
 
 	assert.Len(t, records, len(expectedRecords))
+
 	for recordIndex, record := range records {
 		expectedRecord := expectedRecords[recordIndex]
 		assert.Len(t, record.Dimensions, len(expectedRecord.Dimensions))
 
 		for _, expectedDimension := range expectedRecord.Dimensions {
 			var dimension *types.Dimension
+
 			for _, potentialDimension := range record.Dimensions {
 				if *potentialDimension.Name == *expectedDimension.Name {
 					dimension = &potentialDimension
+
 					break
 				}
 			}
@@ -333,8 +347,10 @@ func TestCreateRecords(t *testing.T) {
 					"Dimension not found that matches expected with Name %s",
 					*expectedDimension.Name,
 				)
+
 				continue
 			}
+
 			assert.Equal(t, *dimension.Value, *expectedDimension.Value)
 		}
 
