@@ -22,6 +22,9 @@ FROM node:21.2.0-bullseye-slim AS node
 # Hadolint for formatting Dockerfiles
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
 
+# Golangci-lint for linting Go
+FROM golangci/golangci-lint:v1.55.2 AS golangci-lint
+
 #################################################
 # Used for development and CI. Any development
 # specific customisations should go in
@@ -59,19 +62,16 @@ RUN apt-get update \
 # Hadolint for linting Dockerfile
 COPY --from=hadolint /bin/hadolint /usr/local/bin/hadolint
 
+# Golangci-lint for linting Go
+COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
+
 # shfmt for formatting shell scripts
-# & golines for formatting go files
 
 # renovate: datasource=go depName=mvdan.cc/sh/v3
 ARG SHFMT_VERSION=v3.7.0
 ENV SHFMT_VERSION=${SHFMT_VERSION}
 
-# renovate: datasource=go depName=github.com/segmentio/golines
-ARG GOLINES_VERSION=v0.11.0
-ENV GOLINES_VERSION=${GOLINES_VERSION}
-
-RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION} \
-  && go install github.com/segmentio/golines@${GOLINES_VERSION}
+RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION}
 
 # renovate: datasource=repology depName=debian_11/less versioning=loose
 ARG LESS_VERSION=551

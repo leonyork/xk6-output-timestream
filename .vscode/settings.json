@@ -17,5 +17,7 @@
   },
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-  }
+  },
+  "go.lintTool": "golangci-lint",
+  "go.lintFlags": ["--fast"]
 }

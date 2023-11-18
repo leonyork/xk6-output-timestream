@@ -42,6 +42,8 @@
         "[markdown]": {
           "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
         },
+        "go.lintTool": "golangci-lint",
+        "go.lintFlags": ["--fast"],
         "shellformat.path": "/go/bin/shfmt",
         "editor.formatOnSave": true,
         "terminal.integrated.defaultProfile.linux": "zsh",
