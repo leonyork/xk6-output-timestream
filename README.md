@@ -18,7 +18,7 @@ Using this extension lets you hook up K6 to AWS Timestream - plus you get a nice
 
 ## Usage
 
-This output is written as an extension to K6 using [xk6 extensions](https://github.com/grafana/xk6) - this is **experimental**.
+This output is written as an extension to K6 using [xk6 extensions](https://github.com/grafana/xk6).
 
 You can use this extension by either:
 
