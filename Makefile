@@ -53,18 +53,18 @@ init-dev:
 
 # Format the code - will change your files
 .PHONY: format
-format: fmt prettier shfmt
+format: prettier shfmt
 	@echo Formatting complete
 
 # Check the code - will fail if checks fail
 .PHONY: check
-check: prettier-check hadolint-check shfmt-check go-vet-check
+check: prettier-check hadolint-check shfmt-check go-vet-check golangci-check
 	@echo Code checking complete
 
-# Formatting with go fmt (golang)
-.PHONY: fmt
-fmt:
-	golines -w .
+# Lint with golangci-lint
+.PHONY: golangci-check
+golangci-check:
+	golangci-lint run ./...
 
 # Formatting with prettier (json)
 .PHONY: prettier
