@@ -187,9 +187,13 @@ func TestFlushMetricsBatching(t *testing.T) {
 				},
 			}
 
-			output.Start()
+			if err := output.Start(); err != nil {
+				t.Fatal(err)
+			}
 			output.AddMetricSamples(sampleContainers)
-			output.Stop()
+			if err := output.Stop(); err != nil {
+				t.Fatal(err)
+			}
 
 			close(queue)
 			var actualWriteRecords = make([]timestreamwrite.WriteRecordsInput, actualNumberOfWriteRecords)
