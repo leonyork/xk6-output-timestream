@@ -51,6 +51,8 @@ go install github.com/cweill/gotests/gotests@latest
 go install mvdan.cc/gofumpt@latest
 
 cp -f .devcontainer/.zshrc $HOME
+# See https://superuser.com/questions/1499698/ssh-login-causes-repeating-characters-in-my-zsh
+echo "export LC_ALL=C.UTF-8" >>~/.zshrc
 
 # Required by vscode extension golang.go
 go install golang.org/x/tools/gopls@latest
