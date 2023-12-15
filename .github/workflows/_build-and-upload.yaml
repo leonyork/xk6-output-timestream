@@ -54,7 +54,7 @@ jobs:
             copy-k6-from-image
         env:
           K6_LOCATION: ./${{ inputs.executable_name }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.executable_name }}
           path: ./${{ inputs.executable_name }}

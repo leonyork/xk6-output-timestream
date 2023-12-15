@@ -25,7 +25,7 @@ jobs:
       # See https://github.com/actions/runner/issues/2033
       - run: git config --global --add safe.directory $GITHUB_WORKSPACE
       - run: make changelog
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: CHANGELOG.md
           path: CHANGELOG.md
