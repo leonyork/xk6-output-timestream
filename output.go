@@ -51,7 +51,7 @@ type Output struct {
 }
 
 func New(params output.Params) (output.Output, error) {
-	extensionConfig, err := GetConsolidatedConfig(params.JSONConfig)
+	extensionConfig, err := GetConsolidatedConfig(params.JSONConfig, params.Environment)
 	if err != nil {
 		return nil, err
 	}

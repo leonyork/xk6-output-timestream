@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/kelseyhightower/envconfig"
+	"github.com/mstoykov/envconfig"
 )
 
 type Config struct {
@@ -48,9 +48,9 @@ func parseJSON(data json.RawMessage) (Config, error) {
 // environment vars config values}, and returns the final result.
 func GetConsolidatedConfig(
 	jsonRawConf json.RawMessage,
+	env map[string]string,
 ) (Config, error) {
 	result := NewConfig()
-
 	if jsonRawConf != nil {
 		jsonConf, err := parseJSON(jsonRawConf)
 		if err != nil {
@@ -61,8 +61,11 @@ func GetConsolidatedConfig(
 	}
 
 	envConfig := Config{}
-	if err := envconfig.Process("", &envConfig); err != nil {
-		return result, fmt.Errorf("unable to parse env config: %w", err)
+	if err := envconfig.Process("", &envConfig, func(key string) (string, bool) {
+		v, ok := env[key]
+		return v, ok
+	}); err != nil {
+		return result, err
 	}
 
 	result = result.apply(envConfig)
