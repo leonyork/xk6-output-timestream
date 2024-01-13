@@ -33,7 +33,7 @@ func TestGetConsolidatedConfig(t *testing.T) {
 
 	t.Run("Defaults applied correctly", func(t *testing.T) {
 		t.Parallel()
-		config, err := GetConsolidatedConfig([]byte("{}"))
+		config, err := GetConsolidatedConfig([]byte("{}"), map[string]string{})
 		require.NoError(t, err)
 		require.Equal(t, "", config.Region)
 		require.Equal(t, "", config.DatabaseName)
@@ -46,7 +46,7 @@ func TestGetConsolidatedConfig(t *testing.T) {
 
 	t.Run("JSON is applied correctly", func(t *testing.T) {
 		t.Parallel()
-		config, err := GetConsolidatedConfig(testJSON)
+		config, err := GetConsolidatedConfig(testJSON, map[string]string{})
 		require.NoError(t, err)
 		require.Equal(t, "us-east-1", config.Region)
 		require.Equal(t, "testDbJson", config.DatabaseName)
@@ -54,12 +54,12 @@ func TestGetConsolidatedConfig(t *testing.T) {
 	})
 
 	t.Run("Env variables applied correctly", func(t *testing.T) {
-		t.Setenv("K6_TIMESTREAM_REGION", "eu-west-1")
-		t.Setenv("K6_TIMESTREAM_DATABASE_NAME", "testDbEnv")
-		t.Setenv("K6_TIMESTREAM_TABLE_NAME", "testTableEnv")
-		t.Setenv("K6_TIMESTREAM_PUSH_INTERVAL", "1h")
-
-		config, err := GetConsolidatedConfig([]byte("{}"))
+		config, err := GetConsolidatedConfig([]byte("{}"), map[string]string{
+			"K6_TIMESTREAM_REGION":        "eu-west-1",
+			"K6_TIMESTREAM_DATABASE_NAME": "testDbEnv",
+			"K6_TIMESTREAM_TABLE_NAME":    "testTableEnv",
+			"K6_TIMESTREAM_PUSH_INTERVAL": "1h",
+		})
 		require.NoError(t, err)
 		require.Equal(t, "eu-west-1", config.Region)
 		require.Equal(t, "testDbEnv", config.DatabaseName)
@@ -69,12 +69,12 @@ func TestGetConsolidatedConfig(t *testing.T) {
 	t.Run(
 		"Env variables applied correctly over json variables",
 		func(t *testing.T) {
-			t.Setenv("K6_TIMESTREAM_REGION", "eu-west-1")
-			t.Setenv("K6_TIMESTREAM_DATABASE_NAME", "testDbEnv")
-			t.Setenv("K6_TIMESTREAM_TABLE_NAME", "testTableEnv")
-			t.Setenv("K6_TIMESTREAM_PUSH_INTERVAL", "1h")
-
-			config, err := GetConsolidatedConfig(testJSON)
+			config, err := GetConsolidatedConfig(testJSON, map[string]string{
+				"K6_TIMESTREAM_REGION":        "eu-west-1",
+				"K6_TIMESTREAM_DATABASE_NAME": "testDbEnv",
+				"K6_TIMESTREAM_TABLE_NAME":    "testTableEnv",
+				"K6_TIMESTREAM_PUSH_INTERVAL": "1h",
+			})
 			require.NoError(t, err)
 			require.Equal(t, "eu-west-1", config.Region)
 			require.Equal(t, "testDbEnv", config.DatabaseName)
