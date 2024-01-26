@@ -41,11 +41,11 @@ K6_TIMESTREAM_TABLE_NAME
 
 You'll also need to setup your AWS credentials - see [the guide on how to do this](https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials).
 
-### Tags
+### Tags Usage and Requirement
 
-The dimensions (see [timestream concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)) are taken from any K6 tags that have non-empty values.
+The timestream record dimensions (see [timestream concepts](https://docs.aws.amazon.com/timestream/latest/developerguide/concepts.html)) for each metric emmitted by k6 are taken from any k6 tags that have non-empty values.
 
-If you do not have any tags setup you will see the error `At least one dimension is required for a record.` logged from timestream. More information can be found in [the K6 documentation](https://k6.io/docs/using-k6/tags-and-groups/) or an example of setting up tags can be found in the [integration test script](test/test.js).
+Every timestream record requires at least one dimension when written, and k6 applies some default tags to metrics emmitted by many core k6 JavaScript API objects such as http requests, groups and checks. However, since some metrics emitted in the global/test scope may not have any k6 default tags, you will likely see the error `At least one dimension is required for a record.` logged from timestream if you do not define at least one custom tag at the topmost scope of your script to cover metrics with no default tags, as in an options object export. More information can be found in [the K6 documentation](https://k6.io/docs/using-k6/tags-and-groups/) or an example of setting up tags can be found in the [integration test script](test/test.js).
 
 ### Grafana Dashboard
 
