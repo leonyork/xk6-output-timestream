@@ -14,7 +14,7 @@ ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
 # Docker CLI for integration tests
-FROM docker:24.0.7-cli AS docker-cli
+FROM docker:25.0.1-cli AS docker-cli
 
 # Node for tooling
 FROM node:21.6.0-bullseye-slim AS node
