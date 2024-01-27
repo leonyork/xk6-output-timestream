@@ -6,44 +6,51 @@ on:
     paths-ignore:
       - "**.md"
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
 jobs:
-  prepare:
-    uses: ./.github/workflows/_prepare.yaml
-
-  validate:
-    uses: ./.github/workflows/_validate.yaml
-    with:
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-    needs:
-      - prepare
-
   build:
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
+        os: [linux]
         arch: [arm64, amd64]
-    uses: ./.github/workflows/_build-and-upload.yaml
-    with:
-      # Only useful for the amd64 build as the builder will be an amd64 image
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-      image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-${{ matrix.arch }}
-      executable_name: k6-${{ matrix.arch }}
-      platform: linux/${{ matrix.arch }}
-    needs:
-      - prepare
+    steps:
+      - uses: actions/checkout@v4
 
-  build-multiarch:
+      - uses: ./.github/actions/build-builder
+
+      - name: Build
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: >
+            docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+            && make build-image push-image
+        env:
+          FULL_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-${{ matrix.arch }}
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: k6-${{ matrix.arch }}
+          path: ./dist/k6
+
+  build-multiarch-docker-manifest:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: "read"
-      packages: "write"
     outputs:
       image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login ghcr.io
         shell: bash
         run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+
       - name: Create multiarch manifest
         run: |
           docker manifest create \
@@ -54,41 +61,57 @@ jobs:
     needs:
       - build
 
+  test:
+    runs-on: ubuntu-22.04
+    environment: Test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login ghcr.io
+        shell: bash
+        run: >
+          docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+          && docker pull ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+
+      - uses: ./.github/actions/build-builder
+
+      - name: Integration Tests
+        uses: ./.github/actions/integration-tests
+        with:
+          image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+
+      - name: Integration Tests (cross-region)
+        uses: ./.github/actions/integration-tests
+        with:
+          image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+          region: eu-west-1
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+    needs:
+      - build-multiarch-docker-manifest
+
   build-grafana:
     uses: ./.github/workflows/_build-grafana.yaml
-
-  integration:
-    uses: ./.github/workflows/_integration.yaml
     with:
-      image: ${{ needs.build-multiarch.outputs.image }}
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-    secrets:
-      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    needs:
-      - prepare
-      - build-multiarch
+      push: true
 
-  integration-cross-region:
-    uses: ./.github/workflows/_integration.yaml
-    with:
-      image: ${{ needs.build-multiarch.outputs.image }}
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-      region: eu-west-1
-    secrets:
-      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    needs:
-      - prepare
-      - build-multiarch
+  tag-release:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Needed so that we trigger the version tag action - see
+          # https://github.com/orgs/community/discussions/27028#discussioncomment-3254367
+          ssh-key: "${{ secrets.SSH_KEY_GITHUB }}"
+          fetch-depth: 0
 
-  release:
-    uses: ./.github/workflows/_release.yaml
-    with:
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-    secrets:
-      SSH_KEY_GITHUB: ${{ secrets.SSH_KEY_GITHUB }}
+      - uses: gembaadvantage/uplift-action@v2
+        with:
+          args: release --skip-changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     needs:
-      - prepare
-      - build-multiarch
-      - validate
-      - integration
-      - integration-cross-region
+      - build
+      - build-multiarch-docker-manifest
+      - test
+      - build-grafana

@@ -1,0 +1,14 @@
+name: Run command in the builder docker image
+description: |
+  Uses the builder built in build-builder to run a command
+
+inputs:
+  cmd:
+    type: string
+    required: true
+
+runs:
+  using: docker
+  image: builder
+  args:
+    - ${{ inputs.cmd }}

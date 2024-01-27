@@ -1,0 +1,14 @@
+name: Build Grafana
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 19 * * *"
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build-grafana.yaml
