@@ -6,14 +6,14 @@
   "build": {
     "context": "..",
     "dockerfile": "./Dockerfile",
-    "target": "ci"
+    "target": "ci",
   },
 
   "containerEnv": {
     // Means that default region is loaded from the ~/.aws/config file.
     // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-region.html
     "AWS_SDK_LOAD_CONFIG": "true",
-    "HOST_AWS_CONFIG_FILE": "${localEnv:HOME}${localEnv:USERPROFILE}/.aws"
+    "HOST_AWS_CONFIG_FILE": "${localEnv:HOME}${localEnv:USERPROFILE}/.aws",
   },
 
   "customizations": {
@@ -22,25 +22,25 @@
         "go.testOnSave": true,
         "editor.codeActionsOnSave": {
           "source.fixAll": true,
-          "source.organizeImports": true
+          "source.organizeImports": true,
         },
         "[go]": {
-          "editor.defaultFormatter": "golang.go"
+          "editor.defaultFormatter": "golang.go",
         },
         "[json]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
+          "editor.defaultFormatter": "esbenp.prettier-vscode",
         },
         "[shellscript]": {
-          "editor.defaultFormatter": "foxundermoon.shell-format"
+          "editor.defaultFormatter": "foxundermoon.shell-format",
         },
         "[dockerfile]": {
-          "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+          "editor.defaultFormatter": "ms-azuretools.vscode-docker",
         },
         "[ignore]": {
-          "editor.defaultFormatter": "foxundermoon.shell-format"
+          "editor.defaultFormatter": "foxundermoon.shell-format",
         },
         "[markdown]": {
-          "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+          "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
         },
         "go.lintTool": "golangci-lint",
         "go.lintFlags": ["--fast"],
@@ -49,9 +49,9 @@
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": {
           "zsh": {
-            "path": "/bin/zsh"
-          }
-        }
+            "path": "/bin/zsh",
+          },
+        },
       },
 
       "extensions": [
@@ -61,9 +61,9 @@
         "exiasr.hadolint",
         "ms-azuretools.vscode-docker",
         "DavidAnson.vscode-markdownlint",
-        "vivaxy.vscode-conventional-commits"
-      ]
-    }
+        "vivaxy.vscode-conventional-commits",
+      ],
+    },
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -74,6 +74,6 @@
 
   "mounts": [
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/root/.aws,type=bind,consistency=cached"
-  ]
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/root/.aws,type=bind,consistency=cached",
+  ],
 }
