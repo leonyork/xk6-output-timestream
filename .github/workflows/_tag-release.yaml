@@ -5,9 +5,6 @@ on:
       git_ref:
         type: string
         required: false
-      builder_image:
-        type: string
-        required: true
     secrets:
       SSH_KEY_GITHUB:
         required: true
@@ -15,11 +12,6 @@ on:
 jobs:
   release:
     runs-on: ubuntu-22.04
-    container:
-      image: ${{ inputs.builder_image }}
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:

@@ -9,49 +9,36 @@ on:
   schedule:
     - cron: "0 19 * * *"
 
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  FULL_IMAGE_NAME: k6-ci
+
 jobs:
-  prepare:
-    uses: ./.github/workflows/_prepare.yaml
+  test:
+    runs-on: ubuntu-22.04
+    environment: Test
+    steps:
+      - uses: actions/checkout@v4
 
-  validate:
-    uses: ./.github/workflows/_validate.yaml
-    with:
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-    needs:
-      - prepare
+      - uses: ./.github/actions/build-builder
 
-  build:
-    uses: ./.github/workflows/_build.yaml
-    with:
-      # Seems to need the CI container on Github Actions rather
-      # than just the builder image :(
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-      image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
-    needs:
-      - prepare
+      - name: Build
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: make FULL_IMAGE_NAME=${{ env.FULL_IMAGE_NAME }} build-image
 
-  build-grafana:
-    uses: ./.github/workflows/_build-grafana.yaml
+      - name: Integration Tests
+        uses: ./.github/actions/integration-tests
+        with:
+          image: ${{ env.FULL_IMAGE_NAME }}
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
 
-  integration:
-    uses: ./.github/workflows/_integration.yaml
-    with:
-      image: ${{ needs.build.outputs.image }}
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-    secrets:
-      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    needs:
-      - prepare
-      - build
-
-  integration-cross-region:
-    uses: ./.github/workflows/_integration.yaml
-    with:
-      image: ${{ needs.build.outputs.image }}
-      builder_image: ${{ needs.prepare.outputs.ci_builder_image }}
-      region: eu-west-1
-    secrets:
-      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-    needs:
-      - prepare
-      - build
+      - name: Integration Tests (cross-region)
+        uses: ./.github/actions/integration-tests
+        with:
+          image: ${{ env.FULL_IMAGE_NAME }}
+          region: eu-west-1
+          aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}

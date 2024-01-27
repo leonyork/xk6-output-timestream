@@ -11,56 +11,52 @@ permissions:
   packages: write
 
 jobs:
-  create-changelog:
+  release:
     runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/${{ github.repository }}-ci-builder:${{ github.sha }}
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # See https://github.com/actions/runner/issues/2033
-      - run: git config --global --add safe.directory $GITHUB_WORKSPACE
-      - run: make changelog
-      - uses: actions/upload-artifact@v4
-        with:
-          name: CHANGELOG.md
-          path: CHANGELOG.md
 
-  release:
-    runs-on: ubuntu-22.04
-    needs:
-      - create-changelog
-    steps:
-      - uses: actions/checkout@v4
-      - name: Download CHANGELOG
-        uses: actions/download-artifact@v4
+      - uses: ./.github/actions/build-builder
+
+      - name: Changelog
+        uses: gembaadvantage/uplift-action@v2
         with:
-          name: CHANGELOG.md
-          path: ./
+          args: changelog --no-stage --no-push --ignore-detached
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Login ghcr.io
         run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+
+      - name: Pull built CI k6 image to cache
+        run: docker pull ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+
       - name: Re-Tag image
+        shell: bash
         run: |
           make \
             IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
             VERSION=${{ github.ref_name }} \
             CACHE_NAME=ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
             retag-image
+
       - name: Update changelog with tagged image
-        run: |
-          make \
-            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
-            VERSION=${{ github.ref_name }} \
-            update-changelog
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: |
+            make \
+              IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+              VERSION=${{ github.ref_name }} \
+              update-changelog
+
       - name: Pull built CI grafana image to cache
         run: docker pull ghcr.io/${{ github.repository_owner }}/grafana-oss:${{ github.sha }}
+
       - name: Tag cached grafana image
+        shell: bash
         run: |
           make \
             GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
@@ -68,12 +64,16 @@ jobs:
             CACHE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss:${{ github.sha }} \
             grafana-tag-cached-image \
             grafana-push-image
+
       - name: Update changelog with tagged grafana image
-        run: |
-          make \
-            GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
-            VERSION=${{ github.ref_name }} \
-            grafana-update-changelog
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: |
+            make \
+              GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
+              VERSION=${{ github.ref_name }} \
+              grafana-update-changelog
+
       - name: Download k6 executable (amd64)
         uses: dawidd6/action-download-artifact@v3
         with:
@@ -81,6 +81,7 @@ jobs:
           workflow_conclusion: success
           commit: ${{ github.sha }}
           name: k6-amd64
+
       - name: Download k6 executable (arm64)
         uses: dawidd6/action-download-artifact@v3
         with:
@@ -96,15 +97,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release-go-package:
-    needs:
-      - release
-    runs-on: ubuntu-22.04
-    container:
-      image: ghcr.io/${{ github.repository }}-ci-builder:${{ github.sha }}
-      credentials:
-        username: ${{ github.repository_owner }}
-        password: ${{ github.token }}
-    steps:
-      - uses: actions/checkout@v4
-      - run: make VERSION=${{ github.ref_name }} release-go
+      - name: Release Go package
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: make VERSION=${{ github.ref_name }} release-go

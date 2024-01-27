@@ -1,0 +1,33 @@
+name: Validate
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: "read"
+
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/build-builder
+
+      - name: Lint
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: >
+            git config --global --add safe.directory $GITHUB_WORKSPACE
+            && make check format && git diff --exit-code
+
+      - name: Unit test
+        uses: ./.github/actions/run-in-builder
+        with:
+          cmd: make test-unit

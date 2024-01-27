@@ -1,0 +1,82 @@
+name: Integration tests
+description: |
+  Runs the inregration tests by deploying to AWS, running the tests and destroying
+
+inputs:
+  image:
+    type: string
+    required: true
+  region:
+    type: string
+    required: false
+  aws-role-arn:
+    type: string
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.aws-role-arn }}
+        aws-region: us-east-1
+
+    - name: Deploy (cross-region)
+      uses: ./.github/actions/run-in-builder
+      with:
+        cmd: make AWS_REGION=${K6_TIMESTREAM_REGION} deploy-infra
+      if: "${{ env.K6_TIMESTREAM_REGION != '' }}"
+      env:
+        K6_TIMESTREAM_REGION: ${{ inputs.region }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_TABLE_NAME: test
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        ENV: ci
+
+    - name: Deploy
+      uses: ./.github/actions/run-in-builder
+      with:
+        cmd: make deploy-infra
+      if: "${{ env.K6_TIMESTREAM_REGION == '' }}"
+      env:
+        K6_TIMESTREAM_REGION: ${{ inputs.region }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_TABLE_NAME: test
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        ENV: ci
+
+    - name: Integration Tests
+      uses: ./.github/actions/run-in-builder
+      with:
+        cmd: make FULL_IMAGE_NAME=${{ inputs.image }} test-integration
+      env:
+        K6_TIMESTREAM_REGION: ${{ inputs.region }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_TABLE_NAME: test
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        ENV: ci
+
+    - name: Destroy (cross-region)
+      uses: ./.github/actions/run-in-builder
+      with:
+        cmd: make AWS_REGION=${K6_TIMESTREAM_REGION} destroy-infra
+      if: "${{ always() && env.K6_TIMESTREAM_REGION != '' }}"
+      env:
+        K6_TIMESTREAM_REGION: ${{ inputs.region }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_TABLE_NAME: test
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        ENV: ci
+
+    - name: Destroy
+      uses: ./.github/actions/run-in-builder
+      with:
+        cmd: make destroy-infra
+      if: "${{ always() && env.K6_TIMESTREAM_REGION == '' }}"
+      env:
+        K6_TIMESTREAM_REGION: ${{ inputs.region }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_TABLE_NAME: test
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        ENV: ci

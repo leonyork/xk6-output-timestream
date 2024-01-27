@@ -1,57 +1,22 @@
 name: Build the builder
-description: Builds the docker image that we'll use to do most of our building
-inputs:
-  image-name:
-    description: The name of the builder image to create without the tag or hostname
-    required: true
-  pull-command:
-    description: The command to pull the image
-    required: true
-  build-and-push-command:
-    description: The command to build and push the image
-    required: true
-  image-name-env-variable-name:
-    description: The name of the environment variable that stores the image name to pull/build/push. This will be updated with the name of the image.
-    required: true
-  cache-name-env-variable-name:
-    description: The name of the environment variable that stores the image name to cache from when building. This will be updated with the name of the cached image.
-    required: true
-  cache-key:
-    description: The key for the cache - (e.g. a hash of the Dockerfile)
-    required: true
-  git_ref:
-    type: string
-    required: false
-outputs:
-  image:
-    description: The image created for use in this run
-    value: ${{ steps.build-builder.outputs.image }}
+description: |
+  Builds the docker image that we'll use to do most of our building.
+  Use the run-in-builder action to run a command in the builder.
 
 runs:
-  using: "composite"
+  using: composite
   steps:
-    - name: Login ghcr.io
-      shell: bash
-      run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
-    - name: Pull cached image
-      if: inputs.pull-command != ''
-      id: cache-image
-      shell: bash
-      run: |
-        export ${{ inputs.image-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.cache-key }}
-        ${{ inputs.pull-command }}
-        echo "image=$(echo ghcr.io/${{ inputs.image-name }}:${{ inputs.cache-key }})" >> $GITHUB_OUTPUT
-    - name: Build and push image
-      id: build-builder
-      shell: bash
-      run: |
-        export ${{ inputs.image-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.git_ref || github.sha }}
-        export ${{ inputs.cache-name-env-variable-name }}=${{ steps.cache-image.outputs.image }}
-        ${{ inputs.build-and-push-command }}
-        echo "image=$(echo $${{ inputs.image-name-env-variable-name }})" >> $GITHUB_OUTPUT
-    - name: Cache image
-      shell: bash
-      run: |
-        export ${{ inputs.image-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.cache-key }}
-        export ${{ inputs.cache-name-env-variable-name }}=ghcr.io/${{ inputs.image-name }}:${{ inputs.git_ref || github.sha }}
-        ${{ inputs.build-and-push-command }}
+    - uses: docker/setup-buildx-action@v3
+
+    - name: Build builder image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: .devcontainer/Dockerfile
+        target: ci
+        tags: builder
+        load: true
+        cache-from: |
+          type=gha,scope=${{ github.ref_name }}-builder
+          type=gha,scope=main-builder
+        cache-to: type=gha,scope=${{ github.ref_name }}-builder

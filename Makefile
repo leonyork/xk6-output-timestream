@@ -10,7 +10,7 @@ all: build test-unit format check build-image deploy-infra test-integration dest
 
 .PHONY: build
 build:
-	xk6 build v$(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_LOCATION)
+	xk6 build v$(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_DIST_LOCATION)
 
 .PHONY: test-unit
 test-unit:
@@ -82,6 +82,7 @@ hadolint-check:
 	@hadolint test/Dockerfile
 	@hadolint test/test.Dockerfile
 	@hadolint grafana/Dockerfile
+	@hadolint .devcontainer/Dockerfile
 	@echo Hadolint Passed
 
 .PHONY: go-vet-check
@@ -104,45 +105,27 @@ shfmt-check:
 check-all:
 	pre-commit run --all-files
 
-#################################################
-# Targets that are mainly run from CI
-#################################################
-
-BUILDER_NAME?=builder
-.PHONY: pull-builder
-pull-builder:
-	-docker pull $(BUILDER_NAME)
-
-CACHE_CMD=
-ifneq ($(CACHE_NAME),)
-	CACHE_CMD=--cache-from $(CACHE_NAME)
-endif
-BUILDER_TARGET=ci
-.PHONY: build-builder
-build-builder: 
-	docker build --target $(BUILDER_TARGET) -t $(BUILDER_NAME) $(CACHE_CMD) .
-
-.PHONY: push-builder
-push-builder:
-	docker push $(BUILDER_NAME)
-
-# In Dockerhub the versions are without the leading 'v'
-export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION)
-
 VERSION=$(shell git tag -l --contains HEAD | grep '^v')
 VERSION_NO_V=$(subst v,,$(VERSION))
 ifneq ($(VERSION_NO_V),)
-	export FULL_IMAGE_NAME=$(IMAGE_NAME):$(K6_VERSION)-timestream$(VERSION_NO_V)
+	export FULL_IMAGE_NAME?=$(IMAGE_NAME):$(K6_VERSION)-timestream$(VERSION_NO_V)
+else
+	# In Dockerhub the versions are without the leading 'v'
+	export FULL_IMAGE_NAME?=$(IMAGE_NAME):$(K6_VERSION)
 endif
 DOCKER_BUILD_CMD=build
-ifneq ($(PLATFORM),)
-	PLATFORM_ARG=--platform $(PLATFORM)
+ifneq ($(GOOS),)
+ifneq ($(GOARCH),)
+	PLATFORM_ARG=--platform $(GOOS)/$(GOARCH)
 	EXTRA_ARGS=$(PLATFORM_ARG) --load
 	DOCKER_BUILD_CMD=buildx build
 endif
+endif
+K6_DIST_LOCATION?=dist/k6
 .PHONY: build-image
-build-image:
-	docker $(DOCKER_BUILD_CMD) --target k6 --build-arg K6_VERSION=$(K6_VERSION) --build-arg VERSION=$(VERSION) $(EXTRA_ARGS) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
+build-image: build
+	$(MAKE) K6_LOCATION=$(K6_DIST_LOCATION) build
+	docker $(DOCKER_BUILD_CMD) --target k6 --build-arg K6_VERSION=$(K6_VERSION) --build-arg VERSION=$(VERSION) --build-arg K6_HOST_LOCATION=$(K6_DIST_LOCATION) $(EXTRA_ARGS) -t $(FULL_IMAGE_NAME) $(CACHE_CMD) .
 
 .PHONY: push-image
 push-image:
@@ -156,11 +139,6 @@ image-name:
 update-changelog:
 	echo '\nTo pull the image for this release, run\n\n`docker pull $(FULL_IMAGE_NAME)`' >> CHANGELOG.md
 
-.PHONY: copy-k6-from-image
-copy-k6-from-image:
-	docker cp $$(docker create $(PLATFORM_ARG) --name tc $(FULL_IMAGE_NAME)):/usr/bin/k6 $(K6_LOCATION)
-	docker rm tc
-
 .PHONY: retag-image
 retag-image:
 	docker buildx imagetools create -t $(FULL_IMAGE_NAME) $(CACHE_NAME)
@@ -173,7 +151,7 @@ release-tag:
 
 .PHONY: release-go
 release-go:
-	GOPROXY=proxy.golang.org go list -m github.com/leonyork/xk6-output-timestream@$(VERSION)
+	GOPROXY=proxy.golang.org go list -m $(REPO)@$(VERSION)
 
 .PHONY: changelog
 changelog:

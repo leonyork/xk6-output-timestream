@@ -55,7 +55,7 @@ An [example dashboard](grafana/dashboards/loadtest/loadtest.json) is provided. Y
 
 I use [VSCode](https://code.visualstudio.com/) for development so this will be the best supported editor. However, you should be able to use other IDEs. If you are using another IDE:
 
-1. The [Dockerfile](Dockerfile) `ci` target shows all the tools you need for a dev environment (e.g. For linting).
+1. The [devcontainer Dockerfile](.devcontainer/Dockerfile) `ci` target shows all the tools you need for a dev environment (e.g. For linting).
 2. There are [suggested tools](.devcontainer/tools.default.sh) you can also use.
 
 ### VSCode
@@ -64,7 +64,7 @@ The preferred way to develop using VSCode is to use the [dev container feature](
 
 If you do want to use different tools (e.g. you don't like the shell setup), create `.devcontainer/tools.override.sh` and base it off [.devcontainer/tools.default.sh](.devcontainer/tools.default.sh).
 
-If you don't want to use dev containers, you'll need to make sure you install the tools from the [Dockerfile](Dockerfile) and the packages in [suggested tools](.devcontainer/tools.default.sh) that are needed for the VSCode extensions.
+If you don't want to use dev containers, you'll need to make sure you install the tools from the [devcontainer Dockerfile](.devcontainer/Dockerfile) and the packages in [suggested tools](.devcontainer/tools.default.sh) that are needed for the VSCode extensions.
 
 ### Where to start for development
 
