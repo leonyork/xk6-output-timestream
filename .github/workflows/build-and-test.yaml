@@ -5,9 +5,13 @@ on:
       - main
     paths-ignore:
       - "**.md"
-  workflow_dispatch:
-  schedule:
-    - cron: "0 19 * * *"
+  pull_request_target:
+    types:
+      - labeled
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
 
 permissions:
   contents: read
@@ -18,6 +22,7 @@ env:
 
 jobs:
   test:
+    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event.label.name == 'approved' }}
     runs-on: ubuntu-22.04
     environment: Test
     steps:
