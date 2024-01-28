@@ -5,6 +5,9 @@ on:
       - main
     paths-ignore:
       - "**.md"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 19 * * *"
 
 permissions:
   contents: read
