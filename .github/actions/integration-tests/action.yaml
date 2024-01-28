@@ -12,6 +12,9 @@ inputs:
   aws-role-arn:
     type: string
     required: true
+  git-sha:
+    type: string
+    required: false
 
 runs:
   using: composite
@@ -29,9 +32,9 @@ runs:
       if: "${{ env.K6_TIMESTREAM_REGION != '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Deploy
@@ -41,9 +44,9 @@ runs:
       if: "${{ env.K6_TIMESTREAM_REGION == '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Integration Tests
@@ -52,9 +55,9 @@ runs:
         cmd: make FULL_IMAGE_NAME=${{ inputs.image }} test-integration
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Destroy (cross-region)
@@ -64,9 +67,9 @@ runs:
       if: "${{ always() && env.K6_TIMESTREAM_REGION != '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Destroy
@@ -76,7 +79,7 @@ runs:
       if: "${{ always() && env.K6_TIMESTREAM_REGION == '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ github.sha }}
+        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
