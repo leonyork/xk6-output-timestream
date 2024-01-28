@@ -27,6 +27,8 @@ jobs:
     environment: Test
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - uses: ./.github/actions/build-builder
 
@@ -40,6 +42,7 @@ jobs:
         with:
           image: ${{ env.FULL_IMAGE_NAME }}
           aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+          git-sha: ${{ github.event.pull_request.head.sha }}
 
       - name: Integration Tests (cross-region)
         uses: ./.github/actions/integration-tests
@@ -47,3 +50,4 @@ jobs:
           image: ${{ env.FULL_IMAGE_NAME }}
           region: eu-west-1
           aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
+          git-sha: ${{ github.event.pull_request.head.sha }}
