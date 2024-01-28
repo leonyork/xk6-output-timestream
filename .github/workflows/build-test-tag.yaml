@@ -30,6 +30,7 @@ jobs:
             docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
             && make build-image push-image
         env:
+          K6_DIST_LOCATION: k6-${{ matrix.arch }}
           FULL_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-${{ matrix.arch }}
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
@@ -37,7 +38,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: k6-${{ matrix.arch }}
-          path: ./dist/k6
+          path: ./k6-${{ matrix.arch }}
 
   build-multiarch-docker-manifest:
     runs-on: ubuntu-22.04
