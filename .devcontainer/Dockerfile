@@ -6,7 +6,7 @@ ARG K6_VERSION=0.49.0
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.21.6-bullseye AS builder
+FROM golang:1.22.0-bullseye AS builder
 
 # renovate: datasource=go depName=go.k6.io/xk6
 ARG XK6_VERSION=v0.10.0
