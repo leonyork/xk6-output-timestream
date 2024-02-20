@@ -4,8 +4,8 @@ go 1.19
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.25.0
-	github.com/aws/aws-sdk-go-v2/config v1.27.0
-	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.24.1
+	github.com/aws/aws-sdk-go-v2/config v1.27.1
+	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.24.2
 	github.com/mstoykov/envconfig v1.4.1-0.20220114105314-765c6d8c76f1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.0 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.1 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.15.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.0 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.0 // indirect
@@ -21,9 +21,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.9.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.19.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.22.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.27.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.19.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.22.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.27.1 // indirect
 	github.com/aws/smithy-go v1.20.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
