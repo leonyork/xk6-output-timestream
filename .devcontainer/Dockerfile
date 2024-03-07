@@ -17,7 +17,7 @@ RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 FROM docker:25.0.4-cli AS docker-cli
 
 # Node for tooling
-FROM node:21.6.2-bullseye-slim AS node
+FROM node:21.7.0-bullseye-slim AS node
 
 # Hadolint for formatting Dockerfiles
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
