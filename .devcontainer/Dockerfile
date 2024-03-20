@@ -23,7 +23,7 @@ FROM node:21.7.1-bullseye-slim AS node
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
 
 # Golangci-lint for linting Go
-FROM golangci/golangci-lint:v1.57.0 AS golangci-lint
+FROM golangci/golangci-lint:v1.57.1 AS golangci-lint
 
 #################################################
 # Used for development and CI. Any development
