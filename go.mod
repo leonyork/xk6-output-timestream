@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.26.1
 	github.com/aws/aws-sdk-go-v2/config v1.27.10
 	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.25.5
-	github.com/mstoykov/envconfig v1.4.1-0.20220114105314-765c6d8c76f1
+	github.com/mstoykov/envconfig v1.5.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
 	go.k6.io/k6 v0.50.0
