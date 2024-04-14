@@ -14,16 +14,13 @@ apt-get install -y \
 	ca-certificates \
 	curl
 
+chmod -R +x .git/hooks
+
 # Useful tools
 apt-get update
 apt-get install -y \
 	zsh \
 	python3 \
-	python3-pip
-
-chmod -R +x .git/hooks
-
-pip install --no-cache-dir \
 	pre-commit
 
 # Command line setup
