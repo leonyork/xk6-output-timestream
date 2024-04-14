@@ -8,7 +8,7 @@
 TOOLS_DEFAULT=.devcontainer/tools.default.sh
 TOOLS_OVERRIDE=.devcontainer/tools.override.sh
 
-if [[ -f "$TOOLS_OVERRIDE" ]]; then
+if [ -f "$TOOLS_OVERRIDE" ]; then
 	echo "Installing dev tools from $TOOLS_OVERRIDE"
 	exec $TOOLS_OVERRIDE
 	exit $?
