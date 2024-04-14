@@ -6,7 +6,7 @@ ARG K6_VERSION=0.50.0
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.22.2-bullseye AS builder
+FROM golang:1.22.2-bookworm AS builder
 
 # renovate: datasource=go depName=go.k6.io/xk6
 ARG XK6_VERSION=v0.11.0
@@ -17,7 +17,7 @@ RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 FROM docker:26.0.1-cli AS docker-cli
 
 # Node for tooling
-FROM node:21.7.3-bullseye-slim AS node
+FROM node:21.7.3-bookworm-slim AS node
 
 # Hadolint for formatting Dockerfiles
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
@@ -42,7 +42,7 @@ COPY --from=docker-cli /usr/local/libexec/docker/cli-plugins/docker-compose /usr
 COPY --from=node /usr/local/bin /usr/local/bin
 COPY --from=node /usr/local/lib /usr/local/lib
 
-# renovate: datasource=repology depName=debian_11/unzip versioning=loose
+# renovate: datasource=repology depName=debian_12/unzip versioning=loose
 ARG UNZIP_VERSION=6.0
 ENV UNZIP_VERSION=${UNZIP_VERSION}
 
@@ -73,8 +73,8 @@ ENV SHFMT_VERSION=${SHFMT_VERSION}
 
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION}
 
-# renovate: datasource=repology depName=debian_11/less versioning=loose
-ARG LESS_VERSION=551
+# renovate: datasource=repology depName=debian_12/less versioning=loose
+ARG LESS_VERSION=590
 ENV LESS_VERSION=${LESS_VERSION}
 
 # hadolint ignore=DL3009
