@@ -49,7 +49,7 @@ Every timestream record requires at least one dimension when written, and k6 app
 
 ### Grafana Dashboard
 
-An [example dashboard](grafana/dashboards/loadtest/loadtest.json) is provided. You can use this dashboard by running `make grafana-build grafana-run`.
+An [example dashboard](grafana/dashboards/loadtest/loadtest.json) is provided. You can use this dashboard by running `make grafana-build grafana-run`. If you are using this with your own test scripts, ensure that you include the `instance_id` and `vu` tags in your test script - see the [integration test script](test/test.js) as an example.
 
 ## Development
 
