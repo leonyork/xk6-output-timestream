@@ -24,7 +24,8 @@
         "^go\\.k6\\.io/k6$",
         "^grafana/k6$",
         "^nginx$",
-        "^docker$"
+        "^docker$",
+        "^golang$"
       ],
       "automerge": true
     }
