@@ -86,7 +86,6 @@ func TestFixtures(t *testing.T) {
 				&timestreamquery.QueryInput{
 					QueryString: aws.String(query),
 				})
-
 			if err != nil {
 				t.Error(err)
 			}
