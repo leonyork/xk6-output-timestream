@@ -9,7 +9,7 @@ require (
 	github.com/mstoykov/envconfig v1.5.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
-	go.k6.io/k6 v0.51.1-0.20240610082146-1f01a9bc2365
+	go.k6.io/k6 v0.51.1-0.20240612130226-3415ce6edc99
 )
 
 require (
