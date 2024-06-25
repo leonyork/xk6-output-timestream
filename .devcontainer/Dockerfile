@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=grafana/k6 versioning=docker
-ARG K6_VERSION=0.51.0
+ARG K6_VERSION=0.52.0
 
 #################################################
 # Basic environment for building the app

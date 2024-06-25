@@ -1,5 +1,5 @@
 # renovate: datasource=docker depName=grafana/k6 versioning=docker
-export K6_VERSION=0.51.0
+export K6_VERSION=0.52.0
 export K6_LOCATION?=$(GOPATH)/bin/k6
 REPO=github.com/leonyork/xk6-output-timestream
 ENV?=dev
