@@ -22,6 +22,7 @@
       "matchPackagePatterns": [
         "^github\\.com/aws/aws\\-sdk\\-go\\-v2",
         "^go\\.k6\\.io/k6$",
+        "^go\\.k6\\.io/xk6$",
         "^grafana/k6$",
         "^nginx$",
         "^docker$",
