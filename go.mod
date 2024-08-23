@@ -6,7 +6,7 @@ toolchain go1.23.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.30.4
-	github.com/aws/aws-sdk-go-v2/config v1.27.29
+	github.com/aws/aws-sdk-go-v2/config v1.27.30
 	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.27.4
 	github.com/mstoykov/envconfig v1.5.0
 	github.com/sirupsen/logrus v1.9.3
