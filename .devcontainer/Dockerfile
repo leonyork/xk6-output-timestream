@@ -92,7 +92,7 @@ RUN npm install --global prettier@${PRETTIER_VERSION}
 
 # uplift for creating versions from conventional commits
 # renovate: datasource=github-releases depName=gembaadvantage/uplift
-ARG UPLIFT_VERSION=v2.24.1
+ARG UPLIFT_VERSION=v2.25.0
 ENV UPLIFT_VERSION=${UPLIFT_VERSION}
 RUN curl -fsSL https://raw.githubusercontent.com/gembaadvantage/uplift/main/scripts/install \
   | bash -s -- -v ${UPLIFT_VERSION} --no-sudo
