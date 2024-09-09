@@ -23,7 +23,7 @@ FROM node:21.7.3-bookworm-slim AS node
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
 
 # Golangci-lint for linting Go
-FROM golangci/golangci-lint:v1.60.3 AS golangci-lint
+FROM golangci/golangci-lint:v1.61.0 AS golangci-lint
 
 #################################################
 # Used for development and CI. Any development
