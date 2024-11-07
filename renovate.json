@@ -1,10 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:base", "docker:enableMajor"],
+  "extends": ["config:recommended", "docker:enableMajor"],
   "ignorePaths": [],
   "postUpdateOptions": ["gomodTidy"],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "fileMatch": [
         "(^|/|\\.)Dockerfile$",
         "(^|/)Dockerfile[^/]*$",
@@ -19,16 +20,16 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": [
-        "^github\\.com/aws/aws\\-sdk\\-go\\-v2",
-        "^go\\.k6\\.io/k6$",
-        "^go\\.k6\\.io/xk6$",
-        "^grafana/k6$",
-        "^nginx$",
-        "^docker$",
-        "^golang$"
-      ],
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": [
+        "/^github\\.com/aws/aws\\-sdk\\-go\\-v2/",
+        "/^go\\.k6\\.io/k6$/",
+        "/^go\\.k6\\.io/xk6$/",
+        "/^grafana/k6$/",
+        "/^nginx$/",
+        "/^docker$/",
+        "/^golang$/"
+      ]
     }
   ]
 }
