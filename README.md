@@ -51,6 +51,36 @@ Every timestream record requires at least one dimension when written, and k6 app
 
 An [example dashboard](grafana/dashboards/loadtest/loadtest.json) is provided. You can use this dashboard by running `make grafana-build grafana-run`. If you are using this with your own test scripts, ensure that you include the `instance_id` and `vu` tags in your test script - see the [integration test script](test/test.js) as an example.
 
+### Troubleshooting
+
+#### Building with other extensions
+
+Between versions of K6 there can be breaking changes for extensions. So, if you're seeing issues using this extension with another extension then first ensure that the two extensions are using the same version of the K6 module. You can usually find the version of the K6 module in the `go.mod` in the extension's repo - the version will be next to the text `go.k6.io/k6`.
+
+You may need to switch to an older version of this (or other) extensions to find a common k6 version. To find out the versions of this extension that correspond to particular K6 versions you can use the commit history. To do this, clone the repo (e.g. `git clone https://github.com/leonyork/xk6-output-timestream.git`) and run `git log --grep=go.k6.io/k6`. This will give you something that looks like:
+
+```sh
+commit 0516c682077778489b9f50c22c7d617eb6f69dd5 (HEAD -> docs/faq, tag: v0.9.62, origin/main, origin/HEAD, main)
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Nov 11 18:36:44 2024 +0000
+
+    fix(deps): update module go.k6.io/k6 to v0.55.0
+
+commit 2a769222eb717e028f2c4b01beec20b54d3c6ead (tag: v0.9.53)
+Author: renovate[bot] <29139614+renovate[bot]@users.noreply.github.com>
+Date:   Mon Sep 30 16:20:32 2024 +0000
+
+    fix(deps): update module go.k6.io/k6 to v0.54.0
+```
+
+Here you can see which commit, and which version (see `tag`) of this extension, included a particular version of the K6 module. For example, if you needed to use k6 module `v0.54.0`, then you could choose `v0.9.53` of this extension.
+
+However, you'd be better off using version just before the k6 module was upgraded so that you have as many updates and fixes included as possible. If you'd like to do this, you'll want to use the version of this extension that's one below the commit that upgraded away from the version you need. For example, if you needed to use k6 module `v0.54.0` again, but you wanted to use the latest version of this extension supporting that version of the k6 module, then you can see the upgrade away from `v0.54.0` (to `v0.55.0`) happens in `v0.9.62`, so taking one version back, you'd want to use `v0.9.61` of this extension.
+
+For more information on the versioning system this extension uses, see [semantic versioning](https://semver.org/).
+
+If you find that this extension isn't using the latest version of the K6 module, you can submit a PR (although version updates are handled fully automatically by [renovate](https://docs.renovatebot.com/)). Without a very strong reason - such as a security vulnerability - PRs won't be accepted to roll back to a previous version of the K6 module.
+
 ## Development
 
 I use [VSCode](https://code.visualstudio.com/) for development so this will be the best supported editor. However, you should be able to use other IDEs. If you are using another IDE:
