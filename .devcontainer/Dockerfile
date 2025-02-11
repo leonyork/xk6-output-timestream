@@ -86,7 +86,7 @@ RUN apt-get update \
 
 # Prettier for formatting
 # renovate: datasource=npm depName=prettier
-ARG PRETTIER_VERSION=3.4.2
+ARG PRETTIER_VERSION=3.5.0
 ENV PRETTIER_VERSION=${PRETTIER_VERSION}
 RUN npm install --global prettier@${PRETTIER_VERSION}
 
