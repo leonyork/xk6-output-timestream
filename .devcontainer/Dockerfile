@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=grafana/k6 versioning=docker
-ARG K6_VERSION=0.56.0
+ARG K6_VERSION=0.57.0
 
 #################################################
 # Basic environment for building the app
@@ -17,13 +17,13 @@ RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 FROM docker:27.5.1-cli AS docker-cli
 
 # Node for tooling
-FROM node:22.13.1-bookworm-slim AS node
+FROM node:22.14.0-bookworm-slim AS node
 
 # Hadolint for formatting Dockerfiles
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
 
 # Golangci-lint for linting Go
-FROM golangci/golangci-lint:v1.63.4 AS golangci-lint
+FROM golangci/golangci-lint:v1.64.5 AS golangci-lint
 
 #################################################
 # Used for development and CI. Any development
