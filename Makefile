@@ -10,6 +10,7 @@ all: build test-unit format check build-image deploy-infra test-integration dest
 
 .PHONY: build
 build:
+	mkdir -p dist
 	xk6 build v$(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_DIST_LOCATION)
 
 .PHONY: test-unit
