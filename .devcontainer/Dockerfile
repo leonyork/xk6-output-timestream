@@ -14,7 +14,7 @@ ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
 # Docker CLI for integration tests
-FROM docker:27.5.1-cli AS docker-cli
+FROM docker:28.0.0-cli AS docker-cli
 
 # Node for tooling
 FROM node:22.14.0-bookworm-slim AS node
@@ -86,7 +86,7 @@ RUN apt-get update \
 
 # Prettier for formatting
 # renovate: datasource=npm depName=prettier
-ARG PRETTIER_VERSION=3.5.1
+ARG PRETTIER_VERSION=3.5.2
 ENV PRETTIER_VERSION=${PRETTIER_VERSION}
 RUN npm install --global prettier@${PRETTIER_VERSION}
 
