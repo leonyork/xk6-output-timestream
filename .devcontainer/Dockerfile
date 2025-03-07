@@ -68,7 +68,7 @@ COPY --from=golangci-lint /usr/bin/golangci-lint /usr/bin/golangci-lint
 # shfmt for formatting shell scripts
 
 # renovate: datasource=go depName=mvdan.cc/sh/v3
-ARG SHFMT_VERSION=v3.10.0
+ARG SHFMT_VERSION=v3.11.0
 ENV SHFMT_VERSION=${SHFMT_VERSION}
 
 RUN go install mvdan.cc/sh/v3/cmd/shfmt@${SHFMT_VERSION}
