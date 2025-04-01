@@ -9,7 +9,7 @@ ARG K6_VERSION=0.57.0
 FROM golang:1.24.1-bookworm AS builder
 
 # renovate: datasource=go depName=go.k6.io/xk6
-ARG XK6_VERSION=v0.16.0
+ARG XK6_VERSION=v0.16.1
 ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
