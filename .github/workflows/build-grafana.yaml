@@ -1,6 +1,7 @@
 name: Build Grafana
 permissions:
   contents: read
+  packages: write
 on:
   pull_request:
     branches:
