@@ -6,7 +6,7 @@ ARG K6_VERSION=1.0.0
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.24.2-bookworm AS builder
+FROM golang:1.24.3-bookworm AS builder
 
 # renovate: datasource=go depName=go.k6.io/xk6
 ARG XK6_VERSION=v0.19.1
