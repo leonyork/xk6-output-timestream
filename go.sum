@@ -26,8 +26,8 @@ github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.1 h1:hXmVKytPfTy5axZ+fYbR5d0c
 github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.1/go.mod h1:MlYRNmYu/fGPoxBQVvBYr9nyr948aY/WLUvwBMBJubs=
 github.com/aws/aws-sdk-go-v2/service/sts v1.33.19 h1:1XuUZ8mYJw9B6lzAkXhqHlJd/XvaX32evhproijJEZY=
 github.com/aws/aws-sdk-go-v2/service/sts v1.33.19/go.mod h1:cQnB8CUnxbMU82JvlqjKR2HBOm3fe9pWorWBza6MBJ4=
-github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.30.2 h1:DS/As6RQSLe2b4IqSBo9QRbth/DxT07LmuFVY//OXJI=
-github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.30.2/go.mod h1:ewPArLDYLkZVKFTkE5dwPk1i6AS3dVWIZ0UYdQVeYAE=
+github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.31.0 h1:trJCeA/Lz3fBIp/0nYbB2SnH9XIlCEm1i5DbmSP+rh4=
+github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.31.0/go.mod h1:ewPArLDYLkZVKFTkE5dwPk1i6AS3dVWIZ0UYdQVeYAE=
 github.com/aws/smithy-go v1.22.2 h1:6D9hW43xKFrRx/tXXfAlIZc4JI+yQe6snnWcQyxSyLQ=
 github.com/aws/smithy-go v1.22.2/go.mod h1:irrKGvNn1InZwb2d7fkIRNucdfwR8R+Ts3wxYa/cJHg=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
@@ -84,8 +84,6 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.10.0 h1:Xv5erBjTwe/5IxqUQTdXv5kgmIvbHo3QQyRwhJsOfJA=
 github.com/stretchr/testify v1.10.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
-go.k6.io/k6 v0.59.0 h1:B1SW2u77/9fr9K43YuNXy6A/AS8VLngO/55EMZRKoic=
-go.k6.io/k6 v0.59.0/go.mod h1:7yI5PDHfF68jrSXJnqsaD6muxFt+3Ru+bjBCJW8KAcs=
 go.k6.io/k6 v1.0.0 h1:m03ILf6kubhhM0h8NTc6J6ifqW8ljX6a2PFOiH7WWBw=
 go.k6.io/k6 v1.0.0/go.mod h1:7yI5PDHfF68jrSXJnqsaD6muxFt+3Ru+bjBCJW8KAcs=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
