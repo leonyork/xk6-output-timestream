@@ -1,15 +1,15 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=grafana/k6 versioning=docker
-ARG K6_VERSION=0.59.0
+ARG K6_VERSION=1.0.0
 
 #################################################
 # Basic environment for building the app
 #################################################
-FROM golang:1.24.2-bookworm AS builder
+FROM golang:1.24.3-bookworm AS builder
 
 # renovate: datasource=go depName=go.k6.io/xk6
-ARG XK6_VERSION=v0.19.1
+ARG XK6_VERSION=v0.19.3
 ENV XK6_VERSION=${XK6_VERSION}
 RUN go install go.k6.io/xk6/cmd/xk6@"${XK6_VERSION}"
 
@@ -23,7 +23,7 @@ FROM node:22.15.0-bookworm-slim AS node
 FROM hadolint/hadolint:v2.12.0-debian AS hadolint
 
 # Golangci-lint for linting Go
-FROM golangci/golangci-lint:v2.1.5 AS golangci-lint
+FROM golangci/golangci-lint:v2.1.6 AS golangci-lint
 
 #################################################
 # Used for development and CI. Any development
