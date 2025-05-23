@@ -1,11 +1,80 @@
 repos:
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.22.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ["@commitlint/config-conventional"]
   - repo: local
     hooks:
-      - id: format
-        name: Format
+      - id: go-mod-tidy
+        name: go mod tidy
         language: system
-        entry: make format
-      - id: check
-        name: Check
+        pass_filenames: false
+        entry: go mod tidy
+        stages:
+          - pre-commit
+      - id: prettier
+        name: Formatting with prettier
         language: system
-        entry: make check
+        pass_filenames: false
+        entry: prettier --write .
+        stages:
+          - pre-commit
+      - id: shfmt
+        name: Formatting shell scripts
+        language: system
+        pass_filenames: false
+        entry: shfmt -w --binary-next-line .
+        stages:
+          - pre-commit
+      - id: hadolint
+        name: Linting Dockerfiles
+        entry: hadolint
+        types: [dockerfile]
+        language: system
+        require_serial: true
+        pass_filenames: true
+        stages:
+          - pre-commit
+      - id: markdownlint-cli2
+        name: Lint Markdown
+        entry: markdownlint-cli2 --fix
+        types: [markdown]
+        language: system
+        pass_filenames: true
+        stages:
+          - pre-commit
+      - id: golangci-lint
+        name: golangci-lint
+        description: Lint Golang code
+        entry: golangci-lint run --fix
+        types: [go]
+        language: system
+        pass_filenames: false
+        stages:
+          - pre-commit
+      - id: nixfmt
+        name: nixfmt
+        description: Format nix code with nixfmt
+        entry: nixfmt
+        language: system
+        files: \.nix$
+        stages:
+          - pre-commit
+      - id: check-with-statix
+        name: Run statix
+        description: statix is a nix static analyzer
+        language: system
+        entry: statix check
+        files: \.nix$
+        pass_filenames: false
+        stages:
+          - pre-commit
+      - id: editorconfig
+        name: Run editorconfig check
+        language: system
+        entry: editorconfig-checker
+        pass_filenames: false
+        stages:
+          - pre-commit

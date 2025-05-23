@@ -6,7 +6,7 @@ ENV?=dev
 export IMAGE_NAME=k6
 
 .PHONY: all
-all: build test-unit format check build-image deploy-infra test-integration destroy-infra
+all: build test-unit pre-commit build-image deploy-infra test-integration destroy-infra
 
 .PHONY: build
 build:
@@ -39,10 +39,10 @@ deploy-infra:
 destroy-infra:
 	aws cloudformation delete-stack --stack-name $(INFRA_STACK_NAME)
 	aws cloudformation wait stack-delete-complete --stack-name $(INFRA_STACK_NAME)
-	
+
 
 #################################################
-# Dev tooling (including code formatting 
+# Dev tooling (including code formatting
 # + checking)
 #################################################
 
@@ -52,58 +52,8 @@ destroy-infra:
 init-dev:
 	pre-commit install
 
-# Format the code - will change your files
-.PHONY: format
-format: prettier shfmt
-	@echo Formatting complete
-
-# Check the code - will fail if checks fail
-.PHONY: check
-check: prettier-check hadolint-check shfmt-check go-vet-check golangci-check
-	@echo Code checking complete
-
-# Lint with golangci-lint
-.PHONY: golangci-check
-golangci-check:
-	golangci-lint run ./...
-
-# Formatting with prettier (json)
-.PHONY: prettier
-prettier:
-	prettier --write .
-
-.PHONY: prettier-check
-prettier-check:
-	@prettier --check .
-
-# Formatting with hadolint (dockerfile)
-.PHONY: hadolint-check
-hadolint-check:
-	@hadolint Dockerfile
-	@hadolint test/Dockerfile
-	@hadolint test/test.Dockerfile
-	@hadolint grafana/Dockerfile
-	@hadolint .devcontainer/Dockerfile
-	@echo Hadolint Passed
-
-.PHONY: go-vet-check
-go-vet-check:
-	@go vet
-	@echo go vet Passed
-
-# Formatting with shfmt (shell scripts)
-.PHONY: shfmt
-shfmt:
-	shfmt -l -w .
-
-.PHONY: shfmt-check
-shfmt-check:
-	@shfmt -l -d .
-	@echo shfmt Passed
-
-# All pre-commit hooks
-.PHONY: check-all
-check-all:
+.PHONY: pre-commit
+pre-commit:
 	pre-commit run --all-files
 
 VERSION=$(shell git tag -l --contains HEAD | grep '^v')
@@ -144,25 +94,14 @@ update-changelog:
 retag-image:
 	docker buildx imagetools create -t $(FULL_IMAGE_NAME) $(CACHE_NAME)
 
-# Tags the repo
-# See https://upliftci.dev/
-.PHONY: release-tag
-release-tag:
-	uplift release --skip-changelog
-
 .PHONY: release-go
 release-go:
 	GOPROXY=proxy.golang.org go list -m $(REPO)@$(VERSION)
 
-.PHONY: changelog
-changelog:
-	uplift changelog --no-stage --no-push --ignore-detached
-
-
 #################################################
 # Example grafana setup
-# Run `make grafana-{target}` to run any of the 
-# targets in ./grafana/Makefile 
+# Run `make grafana-{target}` to run any of the
+# targets in ./grafana/Makefile
 # e.g. `make grafana-build`
 #################################################
 

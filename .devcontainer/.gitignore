@@ -1,1 +1,3 @@
 tools.override.sh
+tools.override.nix
+tools.nix
