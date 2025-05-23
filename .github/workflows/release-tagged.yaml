@@ -10,6 +10,10 @@ permissions:
   contents: write
   packages: write
 
+defaults:
+  run:
+    shell: nix develop -c bash -e {0}
+
 jobs:
   release:
     runs-on: ubuntu-24.04
@@ -18,7 +22,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/build-builder
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: echo "Installed dependencies"
 
       - name: Changelog
         uses: gembaadvantage/uplift-action@v2
@@ -29,13 +40,16 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login ghcr.io
-        run: docker login --username ${{ github.repository_owner }} --password ${{ github.token }} ghcr.io
+        run:
+          docker login --username ${{ github.repository_owner }} --password ${{
+          github.token }} ghcr.io
 
       - name: Pull built CI k6 image to cache
-        run: docker pull ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
+        run:
+          docker pull ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha
+          }}
 
       - name: Re-Tag image
-        shell: bash
         run: |
           make \
             IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
@@ -44,19 +58,18 @@ jobs:
             retag-image
 
       - name: Update changelog with tagged image
-        uses: ./.github/actions/run-in-builder
-        with:
-          cmd: |
-            make \
-              IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
-              VERSION=${{ github.ref_name }} \
-              update-changelog
+        run: |
+          make \
+            IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k6 \
+            VERSION=${{ github.ref_name }} \
+            update-changelog
 
       - name: Pull built CI grafana image to cache
-        run: docker pull ghcr.io/${{ github.repository_owner }}/grafana-oss:${{ github.sha }}
+        run:
+          docker pull ghcr.io/${{ github.repository_owner }}/grafana-oss:${{
+          github.sha }}
 
       - name: Tag cached grafana image
-        shell: bash
         run: |
           make \
             GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
@@ -66,13 +79,11 @@ jobs:
             grafana-push-image
 
       - name: Update changelog with tagged grafana image
-        uses: ./.github/actions/run-in-builder
-        with:
-          cmd: |
-            make \
-              GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
-              VERSION=${{ github.ref_name }} \
-              grafana-update-changelog
+        run: |
+          make \
+            GRAFANA_IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/grafana-oss \
+            VERSION=${{ github.ref_name }} \
+            grafana-update-changelog
 
       - name: Download k6 executable (amd64)
         uses: dawidd6/action-download-artifact@v9
@@ -98,6 +109,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Release Go package
-        uses: ./.github/actions/run-in-builder
-        with:
-          cmd: make VERSION=${{ github.ref_name }} release-go
+        run: make VERSION=${{ github.ref_name }} release-go

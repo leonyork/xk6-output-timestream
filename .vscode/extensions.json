@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "foxundermoon.shell-format",
     "exiasr.hadolint",
+    "mkhl.direnv",
     "ms-azuretools.vscode-containers",
     "DavidAnson.vscode-markdownlint",
     "vivaxy.vscode-conventional-commits"

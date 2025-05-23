@@ -4,16 +4,16 @@ description: |
 
 inputs:
   image:
-    type: string
+    description: Docker image to use for K6
     required: true
   region:
-    type: string
+    description: AWS Region to run tests in
     required: false
   aws-role-arn:
-    type: string
+    description: AWS Role ARN to perform actions in AWS
     required: true
   git-sha:
-    type: string
+    description: The git SHA we're building
     required: false
 
 runs:
@@ -26,60 +26,65 @@ runs:
         aws-region: us-east-1
 
     - name: Deploy (cross-region)
-      uses: ./.github/actions/run-in-builder
-      with:
-        cmd: make AWS_REGION=${K6_TIMESTREAM_REGION} deploy-infra
+      shell: nix develop -c bash -e {0}
+      run: make AWS_REGION=${K6_TIMESTREAM_REGION} deploy-infra
       if: "${{ env.K6_TIMESTREAM_REGION != '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        INFRA_STACK_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Deploy
-      uses: ./.github/actions/run-in-builder
-      with:
-        cmd: make deploy-infra
+      shell: nix develop -c bash -e {0}
+      run: make deploy-infra
       if: "${{ env.K6_TIMESTREAM_REGION == '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        INFRA_STACK_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Integration Tests
-      uses: ./.github/actions/run-in-builder
-      with:
-        cmd: make FULL_IMAGE_NAME=${{ inputs.image }} test-integration
+      shell: nix develop -c bash -e {0}
+      run: make FULL_IMAGE_NAME=${{ inputs.image }} test-integration
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        INFRA_STACK_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Destroy (cross-region)
-      uses: ./.github/actions/run-in-builder
-      with:
-        cmd: make AWS_REGION=${K6_TIMESTREAM_REGION} destroy-infra
+      shell: nix develop -c bash -e {0}
+      run: make AWS_REGION=${K6_TIMESTREAM_REGION} destroy-infra
       if: "${{ always() && env.K6_TIMESTREAM_REGION != '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        INFRA_STACK_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci
 
     - name: Destroy
-      uses: ./.github/actions/run-in-builder
-      with:
-        cmd: make destroy-infra
+      shell: nix develop -c bash -e {0}
+      run: make destroy-infra
       if: "${{ always() && env.K6_TIMESTREAM_REGION == '' }}"
       env:
         K6_TIMESTREAM_REGION: ${{ inputs.region }}
-        K6_TIMESTREAM_DATABASE_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        K6_TIMESTREAM_DATABASE_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         K6_TIMESTREAM_TABLE_NAME: test
-        INFRA_STACK_NAME: github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
+        INFRA_STACK_NAME:
+          github-xk6-output-timestream-${{ inputs.git-sha || github.sha }}
         ENV: ci

@@ -20,9 +20,15 @@ permissions:
 env:
   FULL_IMAGE_NAME: k6-ci
 
+defaults:
+  run:
+    shell: nix develop -c bash -e {0}
+
 jobs:
   test:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event.label.name == 'approved' }}
+    if:
+      ${{ github.event.pull_request.head.repo.full_name == github.repository ||
+      github.event.label.name == 'approved' }}
     runs-on: ubuntu-24.04
     environment: Test
     steps:
@@ -30,12 +36,17 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: ./.github/actions/build-builder
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: echo "Installed dependencies"
 
       - name: Build
-        uses: ./.github/actions/run-in-builder
-        with:
-          cmd: make FULL_IMAGE_NAME=${{ env.FULL_IMAGE_NAME }} build-image
+        run: make FULL_IMAGE_NAME=${{ env.FULL_IMAGE_NAME }} build-image
 
       - name: Integration Tests
         uses: ./.github/actions/integration-tests

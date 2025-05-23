@@ -5,8 +5,7 @@
 
   "build": {
     "context": "..",
-    "dockerfile": "./Dockerfile",
-    "target": "ci"
+    "dockerfile": "./Dockerfile"
   },
 
   "containerEnv": {
@@ -20,6 +19,9 @@
     "vscode": {
       "settings": {
         "go.testOnSave": true,
+        "go.alternateTools": {
+          "go": "/root/.nix-profile/bin/go"
+        },
         "editor.codeActionsOnSave": {
           "source.fixAll": true,
           "source.organizeImports": true
@@ -34,7 +36,7 @@
           "editor.defaultFormatter": "foxundermoon.shell-format"
         },
         "[dockerfile]": {
-          "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+          "editor.defaultFormatter": "foxundermoon.shell-format"
         },
         "[ignore]": {
           "editor.defaultFormatter": "foxundermoon.shell-format"
@@ -44,14 +46,30 @@
         },
         "go.lintTool": "golangci-lint",
         "go.lintFlags": ["--fast"],
-        "shellformat.path": "/go/bin/shfmt",
+        "shellformat.path": "/root/.nix-profile/bin/shfmt",
+        "shellformat.flag": "--binary-next-line",
+        "direnv.path.executable": "/root/.nix-profile/bin/direnv",
         "editor.formatOnSave": true,
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.profiles.linux": {
           "zsh": {
-            "path": "/bin/zsh"
+            "path": "sh",
+            "args": ["--login", "-c", "/root/.nix-profile/bin/zsh"],
+            "env": {
+              "SHELL": "/root/.nix-profile/bin/zsh",
+              "LC_ALL": "C.UTF-8"
+            }
+          },
+          "bash": {
+            "path": "sh",
+            "args": ["--login", "-c", "/root/.nix-profile/bin/bash"],
+            "env": {
+              "SHELL": "/root/.nix-profile/bin/bash",
+              "LC_ALL": "C.UTF-8"
+            }
           }
-        }
+        },
+        "remote.localPortHost": "allInterfaces"
       },
 
       "extensions": [
@@ -59,21 +77,23 @@
         "esbenp.prettier-vscode",
         "foxundermoon.shell-format",
         "exiasr.hadolint",
-        "ms-azuretools.vscode-docker",
+        "mkhl.direnv",
+        "ms-azuretools.vscode-containers",
         "DavidAnson.vscode-markdownlint",
         "vivaxy.vscode-conventional-commits"
       ]
     }
   },
-
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
-  "forwardPorts": [],
-
   "onCreateCommand": "sh ./.devcontainer/tools.sh",
-  //"postCreateCommand": "yarn install",
 
   "mounts": [
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+    "source=nix,target=/nix,type=volume",
+    "source=xk6-output-timestream_cache,target=/root/.cache,type=volume",
+    "source=xk6-output-timestream_local,target=/root/.local,type=volume",
+    "source=xk6-output-timestream_var-cache,target=/var/cache,type=volume",
+    "source=xk6-output-timestream_hist,target=/root/.zsh-hist,type=volume",
+    "source=xk6-output-timestream_tmp,target=/tmp,type=volume",
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/root/.aws,type=bind,consistency=cached"
   ]
 }
