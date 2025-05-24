@@ -36,7 +36,8 @@
         "/^grafana/k6$/",
         "/^nginx$/",
         "/^docker$/",
-        "/^golang$/"
+        "/^golang$/",
+        "/^ubuntu$/"
       ]
     }
   ]
