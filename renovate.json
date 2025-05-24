@@ -6,10 +6,10 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "(^|/|\\.)Dockerfile$",
-        "(^|/)Dockerfile[^/]*$",
-        "Makefile"
+      "managerFilePatterns": [
+        "/(^|/|\\.)Dockerfile$/",
+        "/(^|/)Dockerfile[^/]*$/",
+        "/Makefile/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)(?: (lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s*.*_VERSION *[:?]?\\= *(?<currentValue>.+)"
