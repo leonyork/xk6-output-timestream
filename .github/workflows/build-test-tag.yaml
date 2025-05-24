@@ -89,12 +89,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Login ghcr.io
-        run: >
-          docker login --username ${{ github.repository_owner }} --password ${{
-          github.token }} ghcr.io && docker pull ghcr.io/${{
-          github.repository_owner }}/k6:${{ github.sha }}
-
       - name: Install Nix
         uses: cachix/install-nix-action@v31
         with:
@@ -103,6 +97,12 @@ jobs:
 
       - name: Install dependencies
         run: echo "Installed dependencies"
+
+      - name: Login ghcr.io
+        run: >
+          docker login --username ${{ github.repository_owner }} --password ${{
+          github.token }} ghcr.io && docker pull ghcr.io/${{
+          github.repository_owner }}/k6:${{ github.sha }}
 
       - name: Integration Tests
         uses: ./.github/actions/integration-tests
