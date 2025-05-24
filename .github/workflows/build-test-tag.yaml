@@ -63,17 +63,21 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login ghcr.io
+        shell: bash
         run:
           docker login --username ${{ github.repository_owner }} --password ${{
           github.token }} ghcr.io
 
       - name: Create multiarch manifest
+        shell: bash
         run: |
           docker manifest create \
             ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
             --amend ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-arm64 \
             --amend ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-amd64
-      - run:
+      - name: Push multiarch manifest
+        shell: bash
+        run:
           docker manifest push ghcr.io/${{ github.repository_owner }}/k6:${{
           github.sha }}
     needs:
