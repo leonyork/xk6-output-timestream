@@ -455,7 +455,7 @@
         "y": 1
       },
       "id": 10,
-      "interval": ">1s",
+      "interval": "1s",
       "links": [],
       "options": {
         "legend": {
@@ -1070,7 +1070,7 @@
         "y": 12
       },
       "id": 5,
-      "interval": ">1s",
+      "interval": "1s",
       "links": [],
       "options": {
         "legend": {
