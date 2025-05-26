@@ -1,4 +1,4 @@
-ARG GRAFANA_VERSION=11.6.2
+ARG GRAFANA_VERSION=12.0.1
 FROM grafana/grafana-oss:${GRAFANA_VERSION}
 
 RUN grafana-cli --pluginsDir "${GF_PATHS_PLUGINS}" plugins install grafana-timestream-datasource
