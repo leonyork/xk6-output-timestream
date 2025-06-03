@@ -1,6 +1,6 @@
 FROM docker:28.2.2-cli AS docker-cli
 
-FROM ubuntu:plucky-20250415
+FROM ubuntu:plucky-20250521
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
