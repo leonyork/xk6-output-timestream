@@ -6,7 +6,7 @@ could be a good solution.
 ## Why k6
 
 There's a good (although written by k6!) comparison of k6 against other load
-testing tools [here](https://k6.io/blog/k6-vs-jmeter/).
+testing tools [on the k6 blog](https://k6.io/blog/k6-vs-jmeter/).
 
 The three key points for me are:
 
