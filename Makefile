@@ -1,5 +1,5 @@
 # renovate: datasource=docker depName=grafana/k6 versioning=docker
-export K6_VERSION=1.1.0
+K6_VERSION=1.1.0
 export K6_LOCATION?=$(GOPATH)/bin/k6
 REPO=github.com/leonyork/xk6-output-timestream
 ENV?=dev
@@ -11,7 +11,7 @@ all: build test-unit pre-commit build-image deploy-infra test-integration destro
 .PHONY: build
 build:
 	mkdir -p dist
-	xk6 build v$(K6_VERSION) --with xk6-output-timestream=$(CURDIR) --output $(K6_DIST_LOCATION)
+	xk6 build --with xk6-output-timestream=$(CURDIR) --output $(K6_DIST_LOCATION) v$(K6_VERSION)
 
 .PHONY: test-unit
 test-unit:
