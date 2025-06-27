@@ -1,4 +1,4 @@
-FROM docker:28.2.2-cli AS docker-cli
+FROM docker:28.3.0-cli AS docker-cli
 
 FROM ubuntu:plucky-20250521
 
