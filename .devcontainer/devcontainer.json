@@ -1,11 +1,21 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.224.2/containers/docker-existing-dockerfile
 {
   "name": "dev",
 
-  "build": {
-    "context": "..",
-    "dockerfile": "./Dockerfile"
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+
+  "features": {
+    "ghcr.io/devcontainers/features/nix": {
+      "multiUser": true,
+      "version": "latest",
+      "extraNixConfig": "experimental-features = nix-command flakes"
+    },
+    "ghcr.io/devcontainers/features/docker-outside-of-docker": {}
+  },
+
+  // See https://github.com/NixOS/nix/issues/6680#issuecomment-1577781769
+  "onCreateCommand": {
+    "install-direnv": "nix profile install . && direnv allow && echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc && echo 'eval \"$(direnv hook zsh)\"' >> ~/.zshrc",
+    "build-dev-env": "nix print-dev-env > /dev/null"
   },
 
   "containerEnv": {
@@ -50,50 +60,21 @@
         "shellformat.flag": "--binary-next-line",
         "direnv.path.executable": "/root/.nix-profile/bin/direnv",
         "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "zsh",
-        "terminal.integrated.profiles.linux": {
-          "zsh": {
-            "path": "sh",
-            "args": ["--login", "-c", "/root/.nix-profile/bin/zsh"],
-            "env": {
-              "SHELL": "/root/.nix-profile/bin/zsh",
-              "LC_ALL": "C.UTF-8"
-            }
-          },
-          "bash": {
-            "path": "sh",
-            "args": ["--login", "-c", "/root/.nix-profile/bin/bash"],
-            "env": {
-              "SHELL": "/root/.nix-profile/bin/bash",
-              "LC_ALL": "C.UTF-8"
-            }
-          }
-        },
-        "remote.localPortHost": "allInterfaces"
+        "terminal.integrated.defaultProfile.linux": "zsh"
       },
+      "remote.localPortHost": "allInterfaces"
+    },
 
-      "extensions": [
-        "golang.go",
-        "esbenp.prettier-vscode",
-        "foxundermoon.shell-format",
-        "exiasr.hadolint",
-        "mkhl.direnv",
-        "ms-azuretools.vscode-containers",
-        "DavidAnson.vscode-markdownlint",
-        "vivaxy.vscode-conventional-commits"
-      ]
-    }
-  },
-  "onCreateCommand": "sh ./.devcontainer/tools.sh",
-
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-    "source=nix,target=/nix,type=volume",
-    "source=xk6-output-timestream_cache,target=/root/.cache,type=volume",
-    "source=xk6-output-timestream_local,target=/root/.local,type=volume",
-    "source=xk6-output-timestream_var-cache,target=/var/cache,type=volume",
-    "source=xk6-output-timestream_hist,target=/root/.zsh-hist,type=volume",
-    "source=xk6-output-timestream_tmp,target=/tmp,type=volume",
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/root/.aws,type=bind,consistency=cached"
-  ]
+    "extensions": [
+      "golang.go",
+      "esbenp.prettier-vscode",
+      "foxundermoon.shell-format",
+      "exiasr.hadolint",
+      "jnoortheen.nix-ide",
+      "mkhl.direnv",
+      "ms-azuretools.vscode-containers",
+      "DavidAnson.vscode-markdownlint",
+      "vivaxy.vscode-conventional-commits"
+    ]
+  }
 }

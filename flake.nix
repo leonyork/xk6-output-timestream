@@ -23,6 +23,15 @@
         );
     in
     {
+      packages = forAllSystems (
+        { pkgs, ... }:
+        {
+          default = pkgs.buildEnv {
+            name = "dev";
+            paths = [ pkgs.direnv ] ++ import ./dependencies.nix { inherit pkgs; };
+          };
+        }
+      );
       devShell = forAllSystems (
         { pkgs, ... }:
         pkgs.mkShell {
