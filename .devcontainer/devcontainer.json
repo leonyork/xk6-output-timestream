@@ -17,8 +17,13 @@
     // Allows us to install applications in a known location so they can be referenced by
     // vscode settings (e.g. shfmt)
     "install-direnv": "nix profile install . && direnv allow && echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc && echo 'eval \"$(direnv hook zsh)\"' >> ~/.zshrc",
-    // Check that build of the dev env works
-    "build-dev-env": "nix print-dev-env > /dev/null"
+    // Check/cache the dev env
+    "build-dev-env": "nix print-dev-env > /dev/null",
+    "link-zsh-history-volume": "sudo chown vscode:vscode /home/vscode/.hist && touch /home/vscode/.hist/.zsh_history && ln -nsf /home/vscode/.hist/.zsh_history ~/.zsh_history",
+    "link-bash-history-volume": "sudo chown vscode:vscode /home/vscode/.hist && touch /home/vscode/.hist/.bash_history && ln -nsf /home/vscode/.hist/.bash_history ~/.bash_history",
+    // Allows the container to update the aws directory (just not the config)
+    // For codespaces, the .aws directory isn't mounted, so we create it
+    "setup-aws-config": "sudo mkdir -p /home/vscode/.aws && sudo chown vscode:vscode /home/vscode/.aws && if [ -f '/home/vscode/.aws/host-config' ]; then sh -c 'cat /home/vscode/.aws/host-config | tee /home/vscode/.aws/config >/dev/null'; fi"
   },
 
   "containerEnv": {
@@ -73,5 +78,10 @@
         "vivaxy.vscode-conventional-commits"
       ]
     }
-  }
+  },
+
+  "mounts": [
+    "source=xk6-output-timestream_hist,target=/home/vscode/.hist,type=volume",
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws/config,target=/home/vscode/.aws/host-config,type=bind,readonly,consistency=cached"
+  ]
 }
