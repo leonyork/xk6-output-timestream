@@ -14,7 +14,10 @@
 
   // See https://github.com/NixOS/nix/issues/6680#issuecomment-1577781769
   "onCreateCommand": {
+    // Allows us to install applications in a known location so they can be referenced by
+    // vscode settings (e.g. shfmt)
     "install-direnv": "nix profile install . && direnv allow && echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc && echo 'eval \"$(direnv hook zsh)\"' >> ~/.zshrc",
+    // Check that build of the dev env works
     "build-dev-env": "nix print-dev-env > /dev/null"
   },
 
@@ -29,12 +32,9 @@
     "vscode": {
       "settings": {
         "go.testOnSave": true,
-        "go.alternateTools": {
-          "go": "/root/.nix-profile/bin/go"
-        },
         "editor.codeActionsOnSave": {
-          "source.fixAll": true,
-          "source.organizeImports": true
+          "source.fixAll": "always",
+          "source.organizeImports": "always"
         },
         "[go]": {
           "editor.defaultFormatter": "golang.go"
@@ -56,25 +56,22 @@
         },
         "go.lintTool": "golangci-lint",
         "go.lintFlags": ["--fast"],
-        "shellformat.path": "/root/.nix-profile/bin/shfmt",
+        "shellformat.path": "/home/vscode/.nix-profile/bin/shfmt",
         "shellformat.flag": "--binary-next-line",
-        "direnv.path.executable": "/root/.nix-profile/bin/direnv",
-        "editor.formatOnSave": true,
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "editor.formatOnSave": true
       },
-      "remote.localPortHost": "allInterfaces"
-    },
-
-    "extensions": [
-      "golang.go",
-      "esbenp.prettier-vscode",
-      "foxundermoon.shell-format",
-      "exiasr.hadolint",
-      "jnoortheen.nix-ide",
-      "mkhl.direnv",
-      "ms-azuretools.vscode-containers",
-      "DavidAnson.vscode-markdownlint",
-      "vivaxy.vscode-conventional-commits"
-    ]
+      "remote.localPortHost": "allInterfaces",
+      "extensions": [
+        "golang.go",
+        "esbenp.prettier-vscode",
+        "foxundermoon.shell-format",
+        "exiasr.hadolint",
+        "jnoortheen.nix-ide",
+        "mkhl.direnv",
+        "ms-azuretools.vscode-containers",
+        "DavidAnson.vscode-markdownlint",
+        "vivaxy.vscode-conventional-commits"
+      ]
+    }
   }
 }
