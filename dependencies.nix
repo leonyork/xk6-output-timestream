@@ -16,7 +16,6 @@ with pkgs;
   nodePackages.prettier
   nodePackages.markdownlint-cli2
   pre-commit
-  renovate
   shfmt
   statix
   xk6
