@@ -146,9 +146,7 @@ There are a few options for developing this extension:
 
 - [VSCode](https://code.visualstudio.com/) with a
   [dev container](https://code.visualstudio.com/docs/devcontainers/containers).
-  This will install all the tools you need and set you up with a zsh shell. If
-  you'd like to customise this, you can can see the instructions in
-  [tools.default.sh](.devcontainer/tools.default.sh).
+  This will install all the tools you need and set you up with a zsh shell.
 - Using another IDE but with [nix](https://nixos.org/) to install the tools you
   need - just run `nix develop` to open a shell with the tools installed. If you
   have [direnv](https://direnv.net/) installed, you can just browse to the repo
