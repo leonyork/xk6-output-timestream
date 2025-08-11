@@ -23,7 +23,7 @@ jobs:
     outputs:
       image: ${{ steps.set_image_name.outputs.image }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Login ghcr.io
         run:
