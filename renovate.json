@@ -31,6 +31,7 @@
       "automerge": true,
       "matchPackageNames": [
         "/^actions\\\/checkout$/",
+        "/^aws-actions\\\//",
         "/^github\\.com/aws/aws\\-sdk\\-go\\-v2/",
         "/^go\\.k6\\.io/k6$/",
         "/^go\\.k6\\.io/xk6$/",
