@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=grafana/k6 versioning=docker
-ARG K6_VERSION=1.2.3
+ARG K6_VERSION=1.3.0
 
 FROM grafana/k6:$K6_VERSION AS k6
 ARG K6_HOST_LOCATION=/go/bin/k6
