@@ -27,7 +27,7 @@ services:
       nginx:
         condition: service_healthy
   nginx:
-    image: "nginx:1.29.3-alpine"
+    image: "nginx:1.29.4-alpine"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost"]
       interval: 2s
