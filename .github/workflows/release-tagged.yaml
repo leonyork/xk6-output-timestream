@@ -86,7 +86,7 @@ jobs:
             grafana-update-changelog
 
       - name: Download k6 executable (amd64)
-        uses: dawidd6/action-download-artifact@v12
+        uses: dawidd6/action-download-artifact@v13
         with:
           workflow: build-test-tag.yaml
           workflow_conclusion: success
@@ -94,7 +94,7 @@ jobs:
           name: k6-amd64
 
       - name: Download k6 executable (arm64)
-        uses: dawidd6/action-download-artifact@v12
+        uses: dawidd6/action-download-artifact@v13
         with:
           workflow: build-test-tag.yaml
           workflow_conclusion: success
