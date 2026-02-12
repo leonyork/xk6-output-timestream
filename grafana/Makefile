@@ -1,5 +1,5 @@
 IMAGE_NAME=grafana-oss
-# renovate: datasource=docker depName=grafana/grafana-oss versioning=docker
+# renovate: datasource=docker depName=grafana/grafana versioning=docker
 GRAFANA_VERSION:=12.1.1
 FULL_IMAGE_NAME=$(IMAGE_NAME):$(GRAFANA_VERSION)
 DOCKER_AWS_ARGS:=-e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION -e AWS_REGION=$(shell aws configure get region) -e AWS_ROLE_ARN -e AWS_ROLE_SESSION_NAME -e AWS_SESSION_TOKEN
