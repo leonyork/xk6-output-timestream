@@ -71,15 +71,10 @@ jobs:
       - name: Create multiarch manifest
         shell: bash
         run: |
-          docker manifest create \
-            ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
-            --amend ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-arm64 \
-            --amend ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-amd64
-      - name: Push multiarch manifest
-        shell: bash
-        run:
-          docker manifest push ghcr.io/${{ github.repository_owner }}/k6:${{
-          github.sha }}
+          docker buildx imagetools create \
+            --tag ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }} \
+            ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-arm64 \
+            ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}-amd64
     needs:
       - build
 
