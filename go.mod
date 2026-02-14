@@ -2,7 +2,7 @@ module github.com/leonyork/xk6-output-timestream
 
 go 1.24.0
 
-toolchain go1.24.4
+toolchain go1.25.5
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.1
