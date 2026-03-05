@@ -37,7 +37,7 @@ jobs:
           args: changelog --no-stage --no-push --ignore-detached
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login ghcr.io
         run:
