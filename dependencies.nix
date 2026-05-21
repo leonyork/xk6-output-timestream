@@ -18,5 +18,4 @@ with pkgs;
   pre-commit
   shfmt
   statix
-  xk6
 ]

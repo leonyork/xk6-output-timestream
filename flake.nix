@@ -37,10 +37,12 @@
         pkgs.mkShell {
           buildInputs = import ./dependencies.nix { inherit pkgs; };
           shellHook = ''
+            go install tool
             pre-commit install -f --hook-type commit-msg --hook-type pre-commit
             export AWS_SDK_LOAD_CONFIG=true
             # See https://github.com/NixOS/nixpkgs/issues/267864
             export PYTHONPATH=""
+            export PATH=$(${pkgs.go}/bin/go env GOPATH)/bin:$PATH
           '';
         }
       );

@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/timestreamwrite/types"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"go.k6.io/k6/metrics"
+	"go.k6.io/k6/v2/metrics"
 )
 
 func TestDescription(t *testing.T) {
