@@ -1,7 +1,7 @@
 ARG GRAFANA_VERSION=13.0.1
 FROM grafana/grafana:${GRAFANA_VERSION}
 
-RUN grafana-cli --pluginsDir "${GF_PATHS_PLUGINS}" plugins install grafana-timestream-datasource
+RUN grafana cli --pluginsDir "${GF_PATHS_PLUGINS}" plugins install grafana-timestream-datasource
 COPY provisioning/datasources/* /etc/grafana/provisioning/datasources/
 COPY provisioning/dashboards/* /etc/grafana/provisioning/dashboards/
 COPY dashboards /var/lib/grafana/dashboards
