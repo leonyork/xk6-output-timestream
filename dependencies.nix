@@ -13,8 +13,8 @@ with pkgs;
   k6
   nixfmt-rfc-style
   nodejs
-  nodePackages.prettier
-  nodePackages.markdownlint-cli2
+  prettier
+  markdownlint-cli2
   pre-commit
   shfmt
   statix
