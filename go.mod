@@ -2,7 +2,7 @@ module github.com/leonyork/xk6-output-timestream
 
 go 1.25.0
 
-toolchain go1.26.1
+toolchain go1.26.3
 
 tool go.k6.io/xk6/cmd/xk6
 
