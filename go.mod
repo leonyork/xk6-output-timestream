@@ -9,7 +9,7 @@ tool go.k6.io/xk6/cmd/xk6
 require (
 	github.com/aws/aws-sdk-go-v2 v1.41.12
 	github.com/aws/aws-sdk-go-v2/config v1.32.23
-	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.35.29
+	github.com/aws/aws-sdk-go-v2/service/timestreamwrite v1.35.30
 	github.com/mstoykov/envconfig v1.5.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
