@@ -195,8 +195,8 @@ github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 go.k6.io/k6/v2 v2.0.0 h1:hcr8LXVjKS4ZiVdi6ouXoLBBms+sllF2hjr9VQyhrBY=
 go.k6.io/k6/v2 v2.0.0/go.mod h1:NQXqU7IQ3Ecj0sU2VNHbhdh7xIA+e0qmSCn2QrP7QO0=
-go.k6.io/xk6 v1.4.5 h1:vSmt4V7/a/N24EnVJYrcQ+CcZ4GzmP1y7nxYUT/G/LY=
-go.k6.io/xk6 v1.4.5/go.mod h1:ftmbJgsovaVVx9dFW4aYaN4Mx3uLN2NgwF9dbOxoJgg=
+go.k6.io/xk6 v1.4.6 h1:GlqgSVU8sj2lB/Oeh6UpxuzzLMF/w3ntvKBjgc/kasE=
+go.k6.io/xk6 v1.4.6/go.mod h1:ftmbJgsovaVVx9dFW4aYaN4Mx3uLN2NgwF9dbOxoJgg=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
 go.opentelemetry.io/auto/sdk v1.2.1/go.mod h1:KRTj+aOaElaLi+wW1kO/DZRXwkF4C5xPbEe3ZiIhN7Y=
 go.opentelemetry.io/otel v1.43.0 h1:mYIM03dnh5zfN7HautFE4ieIig9amkNANT+xcVxAj9I=
