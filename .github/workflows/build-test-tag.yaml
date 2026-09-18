@@ -20,7 +20,7 @@ defaults:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     strategy:
       matrix:
         os: [linux]
@@ -55,7 +55,7 @@ jobs:
           path: ./k6-${{ matrix.arch }}
 
   build-multiarch-docker-manifest:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     outputs:
       image: ghcr.io/${{ github.repository_owner }}/k6:${{ github.sha }}
     steps:
@@ -79,7 +79,7 @@ jobs:
       - build
 
   test:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     environment: Test
     steps:
       - uses: actions/checkout@v7
@@ -120,7 +120,7 @@ jobs:
       push: true
 
   tag-release:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
         with:
